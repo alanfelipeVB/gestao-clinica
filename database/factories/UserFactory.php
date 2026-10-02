@@ -29,7 +29,7 @@ class UserFactory extends Factory
             'nome' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'telefone' => fake()->numerify('(##) 9####-####'),
-            'instagram' => '@'.fake()->userName(),
+            'instagram' => str_replace('-', '_', fake()->userName()),
             'profissao' => fake()->randomElement(['Psicólogo(a)', 'Fisioterapeuta', 'Nutricionista', 'Fonoaudiólogo(a)', 'Dermatologista']),
             'perfil' => PerfilUsuario::Profissional,
             'ativo' => true,

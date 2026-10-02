@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ProfissionalController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,11 @@ Route::middleware('auth')->group(function () {
     |----------------------------------------------------------------------
     */
     Route::middleware('perfil:admin')->prefix('admin')->name('admin.')->group(function () {
-        //
+        Route::resource('profissionais', ProfissionalController::class)
+            ->except(['show', 'destroy'])
+            ->parameters(['profissionais' => 'profissional']);
+
+        Route::patch('profissionais/{profissional}/status', [ProfissionalController::class, 'alternarStatus'])
+            ->name('profissionais.status');
     });
 });

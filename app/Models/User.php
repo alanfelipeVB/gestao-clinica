@@ -54,4 +54,16 @@ class User extends Authenticatable
     {
         $query->where('perfil', PerfilUsuario::Profissional);
     }
+
+    /**
+     * Busca por nome ou e-mail.
+     */
+    #[Scope]
+    protected function busca(Builder $query, ?string $termo): void
+    {
+        $query->when($termo, fn (Builder $q) => $q->where(function (Builder $q) use ($termo) {
+            $q->where('nome', 'like', "%{$termo}%")
+                ->orWhere('email', 'like', "%{$termo}%");
+        }));
+    }
 }
