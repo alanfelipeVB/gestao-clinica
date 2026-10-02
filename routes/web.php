@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ConfiguracaoController;
 use App\Http\Controllers\Admin\ProfissionalController;
 use App\Http\Controllers\Admin\SalaController as AdminSalaController;
 use App\Http\Controllers\Auth\LoginController;
@@ -48,5 +49,8 @@ Route::middleware('auth')->group(function () {
 
         Route::patch('salas/{sala}/status', [AdminSalaController::class, 'alternarStatus'])
             ->name('salas.status');
+
+        Route::get('configuracoes', [ConfiguracaoController::class, 'edit'])->name('configuracoes.edit');
+        Route::put('configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');
     });
 });
