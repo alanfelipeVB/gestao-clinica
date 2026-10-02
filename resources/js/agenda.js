@@ -29,7 +29,9 @@ if (elemento) {
     const calendario = new Calendar(elemento, {
         plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
         locale: ptBrLocale,
-        initialView: ehCelular() ? 'listWeek' : 'timeGridWeek',
+        // Com todas as salas, a visão de dia é a mais legível (salas lado a lado);
+        // com uma sala filtrada, a semana dá a melhor visão de disponibilidade.
+        initialView: ehCelular() ? 'listWeek' : (filtroSala.value ? 'timeGridWeek' : 'timeGridDay'),
         initialDate: elemento.dataset.dataInicial || undefined,
         headerToolbar: ehCelular()
             ? { left: 'prev,next', center: 'title', right: 'today' }
@@ -49,6 +51,8 @@ if (elemento) {
         eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         dayMaxEvents: 3,
         eventDisplay: 'block',
+        // Eventos simultâneos (salas diferentes) ficam lado a lado, sem sobreposição.
+        slotEventOverlap: false,
 
         events: {
             url: elemento.dataset.eventosUrl,
@@ -71,6 +75,18 @@ if (elemento) {
             }
 
             const p = arg.event.extendedProps;
+
+            // Semana: colunas estreitas, conteúdo compacto (detalhes no tooltip e no modal).
+            if (arg.view.type === 'timeGridWeek') {
+                return {
+                    html: `
+                        <div class="fc-event-detalhe">
+                            <div class="fw-semibold">${escapar(arg.event.start ? formatarHora(arg.event.start) : '')}</div>
+                            <div class="text-truncate">${escapar(p.profissional.replace(/^(Dra?\.\s+)/, '').split(' ')[0])}</div>
+                        </div>`,
+                };
+            }
+
             return {
                 html: `
                     <div class="fc-event-detalhe">
@@ -80,6 +96,12 @@ if (elemento) {
                         ${p.resumo ? `<div class="opacity-75 fst-italic">${escapar(p.resumo)}</div>` : ''}
                     </div>`,
             };
+        },
+
+        // Tooltip nativo com o resumo completo do agendamento.
+        eventDidMount: (info) => {
+            const p = info.event.extendedProps;
+            info.el.title = [p.horario, info.event.title, p.sala, p.resumo].filter(Boolean).join(' · ');
         },
 
         eventClick: (info) => {

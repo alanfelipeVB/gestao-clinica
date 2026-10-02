@@ -233,3 +233,11 @@ body {
         font-size: 1rem;
     }
 }
+
+/* Semana: colunas estreitas com várias salas — texto em uma linha, cortado. */
+#calendario .fc-timeGridWeek-view .fc-event-detalhe,
+#calendario .fc-timeGridWeek-view .fc-event-detalhe > div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
