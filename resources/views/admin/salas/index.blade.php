@@ -42,7 +42,7 @@
                     <tr>
                         <th>Sala</th>
                         <th class="d-none d-md-table-cell">Descrição</th>
-                        <th class="text-center">Capacidade</th>
+                        <th class="text-center d-none d-sm-table-cell">Capacidade</th>
                         <th>Status</th>
                         <th class="text-end">Ações</th>
                     </tr>
@@ -57,7 +57,7 @@
                                 </div>
                             </td>
                             <td class="d-none d-md-table-cell small">{{ Str::limit($sala->descricao, 80) ?: '—' }}</td>
-                            <td class="text-center">{{ $sala->capacidade ?? '—' }}</td>
+                            <td class="text-center d-none d-sm-table-cell">{{ $sala->capacidade ?? '—' }}</td>
                             <td>
                                 @if ($sala->ativa)
                                     <span class="badge text-bg-success">Ativa</span>
