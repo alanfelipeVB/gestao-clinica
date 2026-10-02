@@ -7,6 +7,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AgendamentoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SalaController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::put('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
+    Route::put('/perfil/senha', [PerfilController::class, 'atualizarSenha'])->name('perfil.senha');
 
     Route::get('/salas', [SalaController::class, 'index'])->name('salas.index');
 
