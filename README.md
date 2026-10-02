@@ -2,7 +2,7 @@
 
 Sistema web para gerenciamento e agendamento de salas de uma clínica. Profissionais consultam a disponibilidade das salas e reservam horários; o administrador gerencia profissionais, salas e todos os agendamentos.
 
-> Projeto em desenvolvimento incremental.
+> Projeto em desenvolvimento incremental. Arquitetura, modelo de dados e regras de negócio: [docs/ARQUITETURA.md](docs/ARQUITETURA.md).
 
 ## Stack
 
