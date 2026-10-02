@@ -10,27 +10,19 @@ class LayoutTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_layout_renderiza_menu_geral(): void
-    {
-        $this->get('/')
-            ->assertOk()
-            ->assertSee('Gestão Clínica')
-            ->assertSee('Dashboard')
-            ->assertSee('Agenda')
-            ->assertDontSee('Administração');
-    }
-
     public function test_admin_ve_secao_de_administracao_e_seu_nome(): void
     {
         $admin = User::factory()->admin()->create(['nome' => 'Maria Admin']);
 
         $this->actingAs($admin)
-            ->get('/')
+            ->get('/dashboard')
             ->assertOk()
+            ->assertSee('Gestão Clínica')
             ->assertSee('Maria Admin')
             ->assertSee('Administração')
             ->assertSee('Profissionais')
-            ->assertSee('Salas');
+            ->assertSee('Salas')
+            ->assertSee('Sair');
     }
 
     public function test_profissional_nao_ve_secao_de_administracao(): void
@@ -38,9 +30,10 @@ class LayoutTest extends TestCase
         $profissional = User::factory()->create(['nome' => 'João Profissional']);
 
         $this->actingAs($profissional)
-            ->get('/')
+            ->get('/dashboard')
             ->assertOk()
             ->assertSee('João Profissional')
+            ->assertSee('Agenda')
             ->assertDontSee('Administração');
     }
 }
