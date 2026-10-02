@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SalaRequest;
 use App\Models\Sala;
+use App\Services\AgendamentoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -65,12 +66,56 @@ class SalaController extends Controller
             ->with('sucesso', "{$sala->nome} atualizada.");
     }
 
-    public function alternarStatus(Sala $sala): RedirectResponse
+    public function alternarStatus(Request $request, Sala $sala, AgendamentoService $agendamentos): RedirectResponse
     {
-        $sala->update(['ativa' => ! $sala->ativa]);
+        if (! $sala->ativa) {
+            $sala->update(['ativa' => true]);
 
-        $acao = $sala->ativa ? 'ativada' : 'desativada';
+            return back()->with('sucesso', "{$sala->nome} foi ativada.");
+        }
 
-        return back()->with('sucesso', "{$sala->nome} foi {$acao}.");
+        $acao = $request->validate([
+            'acao_agendamentos' => ['nullable', Rule::in(['manter', 'cancelar'])],
+        ])['acao_agendamentos'] ?? null;
+
+        $futuros = $sala->agendamentos()->agendados()->futuros()->get();
+
+        // Há agendamentos futuros e o admin ainda não decidiu o que fazer com eles.
+        if ($futuros->isNotEmpty() && $acao === null) {
+            return redirect()->route('admin.salas.desativar', $sala);
+        }
+
+        $cancelados = $acao === 'cancelar'
+            ? $agendamentos->cancelarEmLote($futuros, $request->user(), 'Sala desativada.')
+            : 0;
+
+        $sala->update(['ativa' => false]);
+
+        $mensagem = "{$sala->nome} foi desativada.";
+        if ($cancelados > 0) {
+            $mensagem .= " {$cancelados} agendamento(s) cancelado(s).";
+        } elseif ($futuros->isNotEmpty()) {
+            $mensagem .= " Os agendamentos futuros foram mantidos.";
+        }
+
+        return redirect()->route('admin.salas.index')->with('sucesso', $mensagem);
+    }
+
+    public function confirmarDesativacao(Sala $sala): View|RedirectResponse
+    {
+        $futuros = $sala->agendamentos()->agendados()->futuros()->with('profissional')->orderBy('inicio')->get();
+
+        if (! $sala->ativa || $futuros->isEmpty()) {
+            return redirect()->route('admin.salas.index');
+        }
+
+        return view('admin.confirmar-desativacao', [
+            'titulo' => 'Desativar sala',
+            'nome' => $sala->nome,
+            'agendamentos' => $futuros,
+            'action' => route('admin.salas.status', $sala),
+            'voltar' => route('admin.salas.index'),
+            'mostrarProfissional' => true,
+        ]);
     }
 }

@@ -6,6 +6,7 @@ use App\Enums\PerfilUsuario;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProfissionalRequest;
 use App\Models\User;
+use App\Services\AgendamentoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -70,16 +71,60 @@ class ProfissionalController extends Controller
         return redirect()->route('admin.profissionais.index')->with('sucesso', $mensagem);
     }
 
-    public function alternarStatus(Request $request, User $profissional): RedirectResponse
+    public function alternarStatus(Request $request, User $profissional, AgendamentoService $agendamentos): RedirectResponse
     {
         if ($profissional->is($request->user())) {
             return back()->with('erro', 'Você não pode desativar a sua própria conta.');
         }
 
-        $profissional->update(['ativo' => ! $profissional->ativo]);
+        if (! $profissional->ativo) {
+            $profissional->update(['ativo' => true]);
 
-        $acao = $profissional->ativo ? 'ativado' : 'desativado';
+            return back()->with('sucesso', "{$profissional->nome} foi ativado.");
+        }
 
-        return back()->with('sucesso', "{$profissional->nome} foi {$acao}.");
+        $acao = $request->validate([
+            'acao_agendamentos' => ['nullable', Rule::in(['manter', 'cancelar'])],
+        ])['acao_agendamentos'] ?? null;
+
+        $futuros = $profissional->agendamentos()->agendados()->futuros()->get();
+
+        // Há agendamentos futuros e o admin ainda não decidiu o que fazer com eles.
+        if ($futuros->isNotEmpty() && $acao === null) {
+            return redirect()->route('admin.profissionais.desativar', $profissional);
+        }
+
+        $cancelados = $acao === 'cancelar'
+            ? $agendamentos->cancelarEmLote($futuros, $request->user(), 'Profissional desativado.')
+            : 0;
+
+        $profissional->update(['ativo' => false]);
+
+        $mensagem = "{$profissional->nome} foi desativado.";
+        if ($cancelados > 0) {
+            $mensagem .= " {$cancelados} agendamento(s) cancelado(s).";
+        } elseif ($futuros->isNotEmpty()) {
+            $mensagem .= ' Os agendamentos futuros foram mantidos.';
+        }
+
+        return redirect()->route('admin.profissionais.index')->with('sucesso', $mensagem);
+    }
+
+    public function confirmarDesativacao(Request $request, User $profissional): View|RedirectResponse
+    {
+        $futuros = $profissional->agendamentos()->agendados()->futuros()->with('sala')->orderBy('inicio')->get();
+
+        if (! $profissional->ativo || $futuros->isEmpty() || $profissional->is($request->user())) {
+            return redirect()->route('admin.profissionais.index');
+        }
+
+        return view('admin.confirmar-desativacao', [
+            'titulo' => 'Desativar profissional',
+            'nome' => $profissional->nome,
+            'agendamentos' => $futuros,
+            'action' => route('admin.profissionais.status', $profissional),
+            'voltar' => route('admin.profissionais.index'),
+            'mostrarProfissional' => false,
+        ]);
     }
 }

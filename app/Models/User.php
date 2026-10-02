@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -31,6 +32,16 @@ class User extends Authenticatable
             'ativo' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Agendamentos em que o usuário é o profissional responsável.
+     *
+     * @return HasMany<Agendamento, $this>
+     */
+    public function agendamentos(): HasMany
+    {
+        return $this->hasMany(Agendamento::class, 'user_id');
     }
 
     public function isAdmin(): bool

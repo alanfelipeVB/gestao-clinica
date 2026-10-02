@@ -12,7 +12,12 @@
                                 <i class="bi bi-people me-1"></i>Capacidade: {{ $sala->capacidade }} {{ Str::plural('pessoa', $sala->capacidade) }}
                             </div>
                         @endif
-                        <p class="text-secondary small mb-0 flex-grow-1">{{ $sala->descricao ?: 'Sem descrição.' }}</p>
+                        <p class="text-secondary small mb-3 flex-grow-1">{{ $sala->descricao ?: 'Sem descrição.' }}</p>
+                        <div>
+                            <a href="{{ route('agendamentos.create', ['sala_id' => $sala->id]) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-calendar-plus me-1"></i>Agendar
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

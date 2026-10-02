@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['nome', 'descricao', 'capacidade', 'cor', 'ativa'])]
 class Sala extends Model
@@ -24,6 +25,14 @@ class Sala extends Model
             'capacidade' => 'integer',
             'ativa' => 'boolean',
         ];
+    }
+
+    /**
+     * @return HasMany<Agendamento, $this>
+     */
+    public function agendamentos(): HasMany
+    {
+        return $this->hasMany(Agendamento::class);
     }
 
     #[Scope]

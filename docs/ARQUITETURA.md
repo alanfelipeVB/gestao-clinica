@@ -146,7 +146,8 @@ Verificação e gravação ocorrem dentro de uma transação, com `lockForUpdate
 
 ### 4.6 Edição e cancelamento
 - Profissional edita/cancela apenas os **próprios** agendamentos, e somente **até o horário de início**.
-- Administrador edita/cancela qualquer agendamento.
+- Administrador edita qualquer agendamento que ainda não começou e cancela qualquer agendamento a qualquer momento.
+- Agendamentos cancelados não podem ser editados.
 - Cancelamento registra quem cancelou, quando e o motivo (opcional). Nada é excluído.
 
 ### 4.7 Privacidade na agenda

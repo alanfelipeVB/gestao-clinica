@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ConfiguracaoController;
 use App\Http\Controllers\Admin\ProfissionalController;
 use App\Http\Controllers\Admin\SalaController as AdminSalaController;
+use App\Http\Controllers\AgendamentoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SalaController;
@@ -32,6 +33,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/salas', [SalaController::class, 'index'])->name('salas.index');
 
+    Route::resource('agendamentos', AgendamentoController::class)->except(['destroy']);
+
+    Route::patch('agendamentos/{agendamento}/cancelar', [AgendamentoController::class, 'cancelar'])
+        ->name('agendamentos.cancelar');
+
     /*
     |----------------------------------------------------------------------
     | Somente administrador
@@ -44,11 +50,15 @@ Route::middleware('auth')->group(function () {
 
         Route::patch('profissionais/{profissional}/status', [ProfissionalController::class, 'alternarStatus'])
             ->name('profissionais.status');
+        Route::get('profissionais/{profissional}/desativar', [ProfissionalController::class, 'confirmarDesativacao'])
+            ->name('profissionais.desativar');
 
         Route::resource('salas', AdminSalaController::class)->except(['show', 'destroy']);
 
         Route::patch('salas/{sala}/status', [AdminSalaController::class, 'alternarStatus'])
             ->name('salas.status');
+        Route::get('salas/{sala}/desativar', [AdminSalaController::class, 'confirmarDesativacao'])
+            ->name('salas.desativar');
 
         Route::get('configuracoes', [ConfiguracaoController::class, 'edit'])->name('configuracoes.edit');
         Route::put('configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');

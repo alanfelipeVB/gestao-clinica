@@ -1,0 +1,107 @@
+<x-layouts.app title="Agendamento">
+    <x-page-header titulo="Detalhes do agendamento">
+        <x-slot:acoes>
+            <a href="{{ route('agendamentos.index') }}" class="btn btn-light">
+                <i class="bi bi-arrow-left me-1"></i>Voltar
+            </a>
+            @can('update', $agendamento)
+                <a href="{{ route('agendamentos.edit', $agendamento) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil me-1"></i>Editar
+                </a>
+            @endcan
+            @can('cancel', $agendamento)
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-cancelar">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar agendamento
+                </button>
+            @endcan
+        </x-slot:acoes>
+    </x-page-header>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card h-100" style="border-left: 4px solid {{ $agendamento->sala->cor }};">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="text-secondary small">{{ ucfirst($agendamento->inicio->translatedFormat('l, d \d\e F \d\e Y')) }}</div>
+                            <div class="fs-4 fw-semibold">{{ $agendamento->horario() }}</div>
+                        </div>
+                        <span class="badge fs-6 {{ $agendamento->status->badge() }}">{{ $agendamento->status->label() }}</span>
+                    </div>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3 text-secondary fw-normal">Sala</dt>
+                        <dd class="col-sm-9">{{ $agendamento->sala->nome }}</dd>
+
+                        <dt class="col-sm-3 text-secondary fw-normal">Profissional</dt>
+                        <dd class="col-sm-9">
+                            {{ $agendamento->profissional->nome }}
+                            @if ($agendamento->profissional->profissao)
+                                <span class="text-secondary">— {{ $agendamento->profissional->profissao }}</span>
+                            @endif
+                        </dd>
+
+                        <dt class="col-sm-3 text-secondary fw-normal">Descrição</dt>
+                        <dd class="col-sm-9" style="white-space: pre-line;">{{ $agendamento->descricao }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header bg-white fw-semibold">Histórico</div>
+                <div class="card-body small">
+                    <p class="mb-2">
+                        <i class="bi bi-plus-circle text-success me-1"></i>
+                        Criado em {{ $agendamento->created_at->format('d/m/Y H:i') }}
+                        por {{ $agendamento->criador->nome }}
+                    </p>
+                    @if ($agendamento->updated_at->gt($agendamento->created_at) && $agendamento->estaAgendado())
+                        <p class="mb-2">
+                            <i class="bi bi-pencil text-primary me-1"></i>
+                            Atualizado em {{ $agendamento->updated_at->format('d/m/Y H:i') }}
+                        </p>
+                    @endif
+                    @unless ($agendamento->estaAgendado())
+                        <p class="mb-1">
+                            <i class="bi bi-x-circle text-danger me-1"></i>
+                            Cancelado em {{ $agendamento->cancelado_em->format('d/m/Y H:i') }}
+                            por {{ $agendamento->canceladoPor->nome }}
+                        </p>
+                        @if ($agendamento->motivo_cancelamento)
+                            <p class="text-secondary mb-0 ms-3">Motivo: {{ $agendamento->motivo_cancelamento }}</p>
+                        @endif
+                    @endunless
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @can('cancel', $agendamento)
+        <div class="modal fade" id="modal-cancelar" tabindex="-1" aria-labelledby="modal-cancelar-titulo" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="POST" action="{{ route('agendamentos.cancelar', $agendamento) }}" class="modal-content">
+                    @csrf
+                    @method('PATCH')
+                    <div class="modal-header">
+                        <h2 class="modal-title h5" id="modal-cancelar-titulo">Cancelar agendamento</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            {{ $agendamento->sala->nome }} em {{ $agendamento->inicio->format('d/m/Y') }},
+                            {{ $agendamento->horario() }}. O horário ficará livre para outros profissionais.
+                        </p>
+                        <label for="motivo_cancelamento" class="form-label">Motivo (opcional)</label>
+                        <input type="text" id="motivo_cancelamento" name="motivo_cancelamento" maxlength="255" class="form-control">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Voltar</button>
+                        <button type="submit" class="btn btn-danger">Confirmar cancelamento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endcan
+</x-layouts.app>
