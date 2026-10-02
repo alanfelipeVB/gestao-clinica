@@ -6,6 +6,7 @@ use App\Enums\StatusAgendamento;
 use App\Events\AgendamentoAtualizado;
 use App\Events\AgendamentoCancelado;
 use App\Events\AgendamentoCriado;
+use App\Exceptions\ConflitoDeHorarioException;
 use App\Exceptions\RegraAgendamentoException;
 use App\Models\Agendamento;
 use App\Models\Sala;
@@ -41,15 +42,19 @@ class AgendamentoService
         $this->validarSala($sala);
         $this->validarHorario($dados['inicio'], $dados['fim']);
 
-        $agendamento = DB::transaction(fn () => Agendamento::create([
-            'user_id' => $profissional->id,
-            'sala_id' => $sala->id,
-            'inicio' => $dados['inicio'],
-            'fim' => $dados['fim'],
-            'descricao' => $dados['descricao'],
-            'status' => StatusAgendamento::Agendado,
-            'criado_por' => $autor->id,
-        ]));
+        $agendamento = DB::transaction(function () use ($dados, $profissional, $sala, $autor) {
+            $this->bloquearEVerificarConflitos($sala->id, $profissional->id, $dados['inicio'], $dados['fim']);
+
+            return Agendamento::create([
+                'user_id' => $profissional->id,
+                'sala_id' => $sala->id,
+                'inicio' => $dados['inicio'],
+                'fim' => $dados['fim'],
+                'descricao' => $dados['descricao'],
+                'status' => StatusAgendamento::Agendado,
+                'criado_por' => $autor->id,
+            ]);
+        });
 
         AgendamentoCriado::dispatch($agendamento);
 
@@ -82,13 +87,23 @@ class AgendamentoService
 
         $this->validarHorario($dados['inicio'], $dados['fim']);
 
-        DB::transaction(fn () => $agendamento->update([
-            'user_id' => $dados['user_id'],
-            'sala_id' => $dados['sala_id'],
-            'inicio' => $dados['inicio'],
-            'fim' => $dados['fim'],
-            'descricao' => $dados['descricao'],
-        ]));
+        DB::transaction(function () use ($agendamento, $dados) {
+            $this->bloquearEVerificarConflitos(
+                (int) $dados['sala_id'],
+                (int) $dados['user_id'],
+                $dados['inicio'],
+                $dados['fim'],
+                ignorarId: $agendamento->id,
+            );
+
+            $agendamento->update([
+                'user_id' => $dados['user_id'],
+                'sala_id' => $dados['sala_id'],
+                'inicio' => $dados['inicio'],
+                'fim' => $dados['fim'],
+                'descricao' => $dados['descricao'],
+            ]);
+        });
 
         AgendamentoAtualizado::dispatch($agendamento);
 
@@ -152,6 +167,51 @@ class AgendamentoService
     public function dataLimite(): Carbon
     {
         return today()->addDays($this->configuracoes->antecedenciaMaximaDias());
+    }
+
+    /**
+     * Procura um agendamento ativo que se sobreponha ao período informado.
+     *
+     * Há sobreposição quando: existente.inicio < novo.fim E existente.fim > novo.inicio.
+     * A comparação é estrita, então agendamentos consecutivos (14:00–15:00 e 15:00–16:00)
+     * não conflitam. Cancelados são ignorados.
+     *
+     * @param  'sala_id'|'user_id'  $coluna
+     */
+    public function buscarConflito(string $coluna, int $id, Carbon $inicio, Carbon $fim, ?int $ignorarId = null): ?Agendamento
+    {
+        return Agendamento::query()
+            ->agendados()
+            ->where($coluna, $id)
+            ->where('inicio', '<', $fim)
+            ->where('fim', '>', $inicio)
+            ->when($ignorarId, fn ($q) => $q->whereKeyNot($ignorarId))
+            ->with(['sala', 'profissional'])
+            ->orderBy('inicio')
+            ->first();
+    }
+
+    /**
+     * Deve ser chamado dentro de uma transação.
+     *
+     * Trava as linhas da sala e do profissional (sempre nessa ordem, para evitar deadlock)
+     * até o fim da transação. Assim, duas requisições simultâneas para a mesma sala ou o
+     * mesmo profissional são processadas uma de cada vez e a segunda enxerga a primeira.
+     *
+     * @throws ConflitoDeHorarioException
+     */
+    private function bloquearEVerificarConflitos(int $salaId, int $userId, Carbon $inicio, Carbon $fim, ?int $ignorarId = null): void
+    {
+        Sala::query()->whereKey($salaId)->lockForUpdate()->first();
+        User::query()->whereKey($userId)->lockForUpdate()->first();
+
+        if ($conflito = $this->buscarConflito('sala_id', $salaId, $inicio, $fim, $ignorarId)) {
+            throw ConflitoDeHorarioException::daSala($conflito);
+        }
+
+        if ($conflito = $this->buscarConflito('user_id', $userId, $inicio, $fim, $ignorarId)) {
+            throw ConflitoDeHorarioException::doProfissional($conflito);
+        }
     }
 
     private function validarProfissional(User $profissional): void
