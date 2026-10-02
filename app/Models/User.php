@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\PerfilUsuario;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['nome', 'email', 'telefone', 'instagram', 'profissao', 'perfil', 'ativo', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -25,8 +27,31 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'perfil' => PerfilUsuario::class,
+            'ativo' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->perfil === PerfilUsuario::Admin;
+    }
+
+    public function isProfissional(): bool
+    {
+        return $this->perfil === PerfilUsuario::Profissional;
+    }
+
+    #[Scope]
+    protected function ativos(Builder $query): void
+    {
+        $query->where('ativo', true);
+    }
+
+    #[Scope]
+    protected function profissionais(Builder $query): void
+    {
+        $query->where('perfil', PerfilUsuario::Profissional);
     }
 }

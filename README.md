@@ -32,16 +32,25 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Crie o banco de dados no MySQL:
+Crie os bancos de dados no MySQL (aplicação e testes):
 
 ```sql
 CREATE DATABASE gestao_clinica CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE gestao_clinica_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Ajuste as variáveis `DB_*` no `.env` se necessário e rode as migrations:
+No `.env`, ajuste as variáveis `DB_*` se necessário e defina o administrador inicial:
+
+```dotenv
+ADMIN_NOME="Administrador"
+ADMIN_EMAIL=admin@suaclinica.com
+ADMIN_SENHA=uma-senha-forte
+```
+
+Rode as migrations e o seeder (cria o administrador):
 
 ```bash
-php artisan migrate
+php artisan migrate --seed
 ```
 
 ## Executando em desenvolvimento
@@ -54,6 +63,8 @@ php artisan serve
 Acesse http://localhost:8000.
 
 ## Testes
+
+Os testes usam o banco MySQL `gestao_clinica_testing` (configurado no `phpunit.xml`), que é recriado a cada execução.
 
 ```bash
 php artisan test
