@@ -2,6 +2,5 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Provisório: prévia do layout. Será substituído pelo login/dashboard na etapa de autenticação.
+Route::view('/', 'inicio')->name('inicio');

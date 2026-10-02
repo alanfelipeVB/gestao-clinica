@@ -1,9 +1,154 @@
-@import 'tailwindcss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+/*
+|--------------------------------------------------------------------------
+| Tema da clínica
+|--------------------------------------------------------------------------
+| Personalização feita pelas variáveis CSS do Bootstrap 5.3 (sem Sass).
+*/
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+:root {
+    --clinica-primaria: #0f766e;
+    --clinica-primaria-escura: #115e59;
+    --clinica-primaria-clara: #ccfbf1;
+    --clinica-sidebar-largura: 250px;
+
+    --bs-primary: var(--clinica-primaria);
+    --bs-primary-rgb: 15, 118, 110;
+    --bs-primary-text-emphasis: var(--clinica-primaria-escura);
+    --bs-primary-bg-subtle: var(--clinica-primaria-clara);
+    --bs-primary-border-subtle: #99f6e4;
+    --bs-link-color: var(--clinica-primaria);
+    --bs-link-color-rgb: 15, 118, 110;
+    --bs-link-hover-color: var(--clinica-primaria-escura);
+    --bs-link-hover-color-rgb: 17, 94, 89;
+    --bs-focus-ring-color: rgba(15, 118, 110, 0.25);
+
+    --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --bs-body-bg: #f4f6f8;
+    --bs-border-radius: 0.5rem;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--clinica-primaria);
+    --bs-btn-border-color: var(--clinica-primaria);
+    --bs-btn-hover-bg: var(--clinica-primaria-escura);
+    --bs-btn-hover-border-color: var(--clinica-primaria-escura);
+    --bs-btn-active-bg: var(--clinica-primaria-escura);
+    --bs-btn-active-border-color: var(--clinica-primaria-escura);
+    --bs-btn-disabled-bg: var(--clinica-primaria);
+    --bs-btn-disabled-border-color: var(--clinica-primaria);
+    --bs-btn-focus-shadow-rgb: 15, 118, 110;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--clinica-primaria);
+    --bs-btn-border-color: var(--clinica-primaria);
+    --bs-btn-hover-bg: var(--clinica-primaria);
+    --bs-btn-hover-border-color: var(--clinica-primaria);
+    --bs-btn-active-bg: var(--clinica-primaria-escura);
+    --bs-btn-active-border-color: var(--clinica-primaria-escura);
+    --bs-btn-focus-shadow-rgb: 15, 118, 110;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: #5eead4;
+    box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+.form-check-input:checked {
+    background-color: var(--clinica-primaria);
+    border-color: var(--clinica-primaria);
+}
+
+.pagination {
+    --bs-pagination-color: var(--clinica-primaria);
+    --bs-pagination-active-bg: var(--clinica-primaria);
+    --bs-pagination-active-border-color: var(--clinica-primaria);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Layout: menu lateral + conteúdo
+|--------------------------------------------------------------------------
+*/
+
+.app-sidebar {
+    --bs-offcanvas-width: var(--clinica-sidebar-largura);
+    --bs-offcanvas-bg: #0b3b38;
+    /* .offcanvas-lg força fundo transparente em telas grandes; mantém a cor do menu. */
+    background-color: #0b3b38 !important;
+}
+
+.app-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.75);
+    border-radius: var(--bs-border-radius);
+    padding: 0.55rem 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.app-sidebar .nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.app-sidebar .nav-link.active {
+    color: #fff;
+    background: var(--clinica-primaria);
+}
+
+.app-sidebar .nav-link.disabled {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.app-sidebar .sidebar-secao {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 1rem 0.85rem 0.35rem;
+}
+
+@media (min-width: 992px) {
+    .app-sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: var(--clinica-sidebar-largura);
+        overflow-y: auto;
+    }
+
+    .app-main {
+        margin-left: var(--clinica-sidebar-largura);
+    }
+}
+
+.app-topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.card {
+    border: 0;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+.table > thead th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bs-secondary-color);
+}
+
+/* Telas sem autenticação (login) */
+.guest-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0b3b38 0%, var(--clinica-primaria) 100%);
 }
