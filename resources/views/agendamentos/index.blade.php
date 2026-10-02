@@ -71,40 +71,48 @@
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Data</th>
-                        <th>Horário</th>
+                        <th>Data e horário</th>
                         <th>Sala</th>
                         @if ($ehAdmin)
-                            <th>Profissional</th>
+                            <th class="d-none d-md-table-cell">Profissional</th>
                         @endif
                         <th class="d-none d-xl-table-cell">Descrição</th>
-                        <th>Status</th>
+                        <th class="d-none d-sm-table-cell">Status</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($agendamentos as $agendamento)
                         <tr @class(['text-secondary' => ! $agendamento->estaAgendado()])>
-                            <td class="text-nowrap">{{ $agendamento->inicio->format('d/m/Y') }}</td>
-                            <td class="text-nowrap">{{ $agendamento->horario() }}</td>
+                            <td class="text-nowrap">
+                                <div class="small text-secondary">{{ $agendamento->inicio->format('d/m/Y') }}</div>
+                                <div class="fw-semibold">{{ $agendamento->horario() }}</div>
+                            </td>
                             <td>
-                                <span class="d-inline-flex align-items-center gap-2 text-nowrap">
+                                <span class="d-inline-flex align-items-center gap-2">
                                     <span class="rounded-circle flex-shrink-0" style="width: .7rem; height: .7rem; background: {{ $agendamento->sala->cor }};"></span>
                                     {{ $agendamento->sala->nome }}
                                 </span>
+                                @if ($ehAdmin)
+                                    <div class="small text-secondary d-md-none">{{ $agendamento->profissional->nome }}</div>
+                                @endif
+                                {{-- Em telas pequenas, o status aparece aqui. --}}
+                                <div class="d-sm-none">
+                                    <span class="badge {{ $agendamento->status->badge() }}">{{ $agendamento->status->label() }}</span>
+                                </div>
                             </td>
                             @if ($ehAdmin)
-                                <td>{{ $agendamento->profissional->nome }}</td>
+                                <td class="d-none d-md-table-cell">{{ $agendamento->profissional->nome }}</td>
                             @endif
                             <td class="d-none d-xl-table-cell small">{{ Str::limit($agendamento->descricao, 60) }}</td>
-                            <td><span class="badge {{ $agendamento->status->badge() }}">{{ $agendamento->status->label() }}</span></td>
+                            <td class="d-none d-sm-table-cell"><span class="badge {{ $agendamento->status->badge() }}">{{ $agendamento->status->label() }}</span></td>
                             <td class="text-end text-nowrap">
                                 <a href="{{ route('agendamentos.show', $agendamento) }}" class="btn btn-sm btn-outline-secondary"
                                    title="Detalhes" data-bs-toggle="tooltip">
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 @can('update', $agendamento)
-                                    <a href="{{ route('agendamentos.edit', $agendamento) }}" class="btn btn-sm btn-outline-primary"
+                                    <a href="{{ route('agendamentos.edit', $agendamento) }}" class="btn btn-sm btn-outline-primary d-none d-sm-inline-block"
                                        title="Editar" data-bs-toggle="tooltip">
                                         <i class="bi bi-pencil"></i>
                                     </a>
@@ -113,7 +121,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $ehAdmin ? 7 : 6 }}" class="text-center text-secondary py-5">
+                            <td colspan="{{ $ehAdmin ? 6 : 5 }}" class="text-center text-secondary py-5">
                                 <i class="bi bi-calendar-x fs-2 d-block mb-2"></i>
                                 Nenhum agendamento encontrado.
                             </td>

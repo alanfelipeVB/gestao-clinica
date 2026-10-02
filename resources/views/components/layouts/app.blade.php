@@ -33,7 +33,7 @@
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="rounded-circle bg-primary-subtle text-primary-emphasis fw-semibold d-inline-flex align-items-center justify-content-center"
                                   style="width: 2rem; height: 2rem;">
-                                {{ mb_strtoupper(mb_substr(auth()->user()->nome, 0, 1)) }}
+                                {{ mb_strtoupper(mb_substr(auth()->user()->primeiroNome(), 0, 1)) }}
                             </span>
                             <span class="d-none d-sm-inline">{{ auth()->user()->nome }}</span>
                         </button>
