@@ -14,13 +14,14 @@
             <x-sidebar-link rota="dashboard" icone="speedometer2">Dashboard</x-sidebar-link>
             <x-sidebar-link rota="agenda" icone="calendar3">Agenda</x-sidebar-link>
             <x-sidebar-link rota="agendamentos.index" icone="journal-check">Agendamentos</x-sidebar-link>
+            <x-sidebar-link rota="salas.index" icone="door-open">Salas</x-sidebar-link>
         </ul>
 
         @if (auth()->user()?->isAdmin())
             <div class="sidebar-secao">Administração</div>
             <ul class="nav flex-column gap-1">
                 <x-sidebar-link rota="admin.profissionais.index" icone="people">Profissionais</x-sidebar-link>
-                <x-sidebar-link rota="admin.salas.index" icone="door-open">Salas</x-sidebar-link>
+                <x-sidebar-link rota="admin.salas.index" icone="building-gear">Gerenciar salas</x-sidebar-link>
                 <x-sidebar-link rota="admin.configuracoes.edit" icone="gear">Configurações</x-sidebar-link>
             </ul>
         @endif

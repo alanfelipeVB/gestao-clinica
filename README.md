@@ -47,7 +47,7 @@ ADMIN_EMAIL=admin@suaclinica.com
 ADMIN_SENHA=uma-senha-forte
 ```
 
-Rode as migrations e o seeder (cria o administrador):
+Rode as migrations e o seeder (cria o administrador e, com `APP_ENV=local`, salas de exemplo):
 
 ```bash
 php artisan migrate --seed

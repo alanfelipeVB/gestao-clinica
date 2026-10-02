@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\ProfissionalController;
+use App\Http\Controllers\Admin\SalaController as AdminSalaController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SalaController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -27,6 +29,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
+    Route::get('/salas', [SalaController::class, 'index'])->name('salas.index');
+
     /*
     |----------------------------------------------------------------------
     | Somente administrador
@@ -39,5 +43,10 @@ Route::middleware('auth')->group(function () {
 
         Route::patch('profissionais/{profissional}/status', [ProfissionalController::class, 'alternarStatus'])
             ->name('profissionais.status');
+
+        Route::resource('salas', AdminSalaController::class)->except(['show', 'destroy']);
+
+        Route::patch('salas/{sala}/status', [AdminSalaController::class, 'alternarStatus'])
+            ->name('salas.status');
     });
 });

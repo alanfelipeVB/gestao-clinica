@@ -17,5 +17,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
         ]);
+
+        // Dados de exemplo apenas em desenvolvimento.
+        if (app()->environment('local')) {
+            $this->call([
+                SalaSeeder::class,
+            ]);
+        }
     }
 }
