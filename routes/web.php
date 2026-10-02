@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ConfiguracaoController;
 use App\Http\Controllers\Admin\ProfissionalController;
 use App\Http\Controllers\Admin\SalaController as AdminSalaController;
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AgendamentoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
@@ -32,6 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::get('/salas', [SalaController::class, 'index'])->name('salas.index');
+
+    Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
+    Route::get('/agenda/eventos', [AgendaController::class, 'eventos'])->name('agenda.eventos');
 
     Route::resource('agendamentos', AgendamentoController::class)->except(['destroy']);
 

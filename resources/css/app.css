@@ -157,3 +157,79 @@
 body {
     background-color: var(--clinica-fundo);
 }
+
+/*
+|--------------------------------------------------------------------------
+| Agenda (FullCalendar)
+|--------------------------------------------------------------------------
+*/
+
+#calendario {
+    --fc-button-bg-color: #fff;
+    --fc-button-text-color: var(--clinica-primaria);
+    --fc-button-border-color: var(--bs-border-color);
+    --fc-button-hover-bg-color: var(--clinica-primaria-clara);
+    --fc-button-hover-border-color: var(--bs-border-color);
+    --fc-button-active-bg-color: var(--clinica-primaria);
+    --fc-button-active-border-color: var(--clinica-primaria);
+    --fc-today-bg-color: rgba(15, 118, 110, 0.06);
+    --fc-now-indicator-color: #dc2626;
+    --fc-border-color: #e5e7eb;
+    font-size: 0.875rem;
+}
+
+#calendario .fc-button-active {
+    color: #fff;
+}
+
+#calendario .fc-toolbar-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+#calendario a.fc-col-header-cell-cushion,
+#calendario a.fc-daygrid-day-number,
+#calendario a.fc-list-day-text,
+#calendario a.fc-list-day-side-text {
+    color: inherit;
+    text-decoration: none;
+}
+
+#calendario .fc-event {
+    cursor: pointer;
+}
+
+#calendario .fc-event-detalhe {
+    padding: 2px 4px;
+    line-height: 1.25;
+    overflow: hidden;
+    font-size: 0.78rem;
+}
+
+#calendario .fc-event-linha {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 2px;
+}
+
+/* Agendamento de colega (sem detalhes): visual listrado e esmaecido. */
+#calendario .evento-ocupado {
+    opacity: 0.75;
+    background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.18) 0 6px, transparent 6px 12px);
+}
+
+#calendario .fc-highlight {
+    background: rgba(15, 118, 110, 0.15);
+}
+
+@media (max-width: 767.98px) {
+    #calendario .fc-toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    #calendario .fc-toolbar-title {
+        font-size: 1rem;
+    }
+}
