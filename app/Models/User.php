@@ -44,6 +44,21 @@ class User extends Authenticatable
         return $this->hasMany(Agendamento::class, 'user_id');
     }
 
+    /**
+     * Primeiro nome, ignorando títulos (ex.: "Dra. Ana Ribeiro" → "Ana").
+     */
+    public function primeiroNome(): string
+    {
+        $partes = preg_split('/\s+/', trim($this->nome));
+        $titulos = ['dr', 'dra', 'sr', 'sra', 'prof', 'profa'];
+
+        while (count($partes) > 1 && in_array(mb_strtolower(rtrim($partes[0], '.')), $titulos, true)) {
+            array_shift($partes);
+        }
+
+        return $partes[0];
+    }
+
     public function isAdmin(): bool
     {
         return $this->perfil === PerfilUsuario::Admin;

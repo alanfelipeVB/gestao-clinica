@@ -50,6 +50,14 @@ class UsuarioTest extends TestCase
         $this->assertSame(2, User::profissionais()->ativos()->count());
     }
 
+    public function test_primeiro_nome_ignora_titulos(): void
+    {
+        $this->assertSame('Ana', (new User(['nome' => 'Dra. Ana Ribeiro']))->primeiroNome());
+        $this->assertSame('João', (new User(['nome' => 'Dr João Martins']))->primeiroNome());
+        $this->assertSame('Maria', (new User(['nome' => 'Maria Souza']))->primeiroNome());
+        $this->assertSame('Dra.', (new User(['nome' => 'Dra.']))->primeiroNome());
+    }
+
     public function test_admin_seeder_cria_administrador_a_partir_da_config(): void
     {
         config([

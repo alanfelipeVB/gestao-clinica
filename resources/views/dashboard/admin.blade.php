@@ -1,5 +1,5 @@
 <x-layouts.app title="Dashboard">
-    <x-page-header :titulo="'Olá, '.Str::before(auth()->user()->nome, ' ').'!'"
+    <x-page-header :titulo="'Olá, '.auth()->user()->primeiroNome().'!'"
                    :subtitulo="ucfirst(now()->translatedFormat('l, d \d\e F \d\e Y'))">
         <x-slot:acoes>
             <a href="{{ route('agenda') }}" class="btn btn-outline-primary">
