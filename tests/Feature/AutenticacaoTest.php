@@ -16,9 +16,9 @@ class AutenticacaoTest extends TestCase
         $this->get('/login')->assertOk()->assertSee('Acesse sua conta');
     }
 
-    public function test_raiz_redireciona_visitante_para_login(): void
+    public function test_raiz_e_a_pagina_publica_e_o_sistema_exige_login(): void
     {
-        $this->get('/')->assertRedirect('/dashboard');
+        $this->get('/')->assertOk()->assertSee(route('login'));
         $this->get('/dashboard')->assertRedirect('/login');
     }
 

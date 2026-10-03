@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ConfiguracaoController;
+use App\Http\Controllers\Admin\PaginaInicialController;
 use App\Http\Controllers\Admin\ProfissionalController;
 use App\Http\Controllers\Admin\SalaController as AdminSalaController;
 use App\Http\Controllers\Admin\TutorialController as AdminTutorialController;
@@ -11,10 +12,17 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\SalaController;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/dashboard');
+/*
+|--------------------------------------------------------------------------
+| Página pública da clínica
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [SiteController::class, 'inicio'])->name('inicio');
+Route::get('/marca/logo', [SiteController::class, 'logo'])->name('site.logo');
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +95,9 @@ Route::middleware('auth')->group(function () {
             ->parameters(['tutoriais' => 'tutorial']);
         Route::patch('tutoriais/{tutorial}/publicacao', [AdminTutorialController::class, 'alternarPublicacao'])
             ->name('tutoriais.publicacao');
+
+        Route::get('pagina-inicial', [PaginaInicialController::class, 'edit'])->name('pagina-inicial.edit');
+        Route::put('pagina-inicial', [PaginaInicialController::class, 'update'])->name('pagina-inicial.update');
 
         Route::get('configuracoes', [ConfiguracaoController::class, 'edit'])->name('configuracoes.edit');
         Route::put('configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');

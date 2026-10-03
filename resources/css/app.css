@@ -241,3 +241,26 @@ body {
     overflow: hidden;
     text-overflow: clip;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Página pública
+|--------------------------------------------------------------------------
+*/
+
+body.site {
+    background-color: #fff;
+}
+
+.site-hero {
+    background: linear-gradient(135deg, #0b3b38 0%, var(--clinica-primaria) 100%);
+}
+
+.site-rodape {
+    background: #0b3b38;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.min-w-0 {
+    min-width: 0;
+}

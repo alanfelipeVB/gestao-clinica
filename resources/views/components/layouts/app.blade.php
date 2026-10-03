@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ? $title.' · ' : '' }}{{ config('app.name') }}</title>
+    <title>{{ $title ? $title.' · ' : '' }}{{ $marca['nome'] }}</title>
 
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -70,7 +70,7 @@
         </main>
 
         <footer class="px-3 px-lg-4 py-3 small text-secondary">
-            &copy; {{ date('Y') }} {{ config('app.name') }}
+            &copy; {{ date('Y') }} {{ $marca['nome'] }}
         </footer>
     </div>
 
