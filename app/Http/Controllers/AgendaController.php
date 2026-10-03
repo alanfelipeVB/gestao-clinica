@@ -82,6 +82,7 @@ class AgendaController extends Controller
                 'horario' => $agendamento->horario(),
                 'descricao' => $podeVerDetalhes ? $agendamento->descricao : null,
                 'resumo' => $podeVerDetalhes ? Str::limit($agendamento->descricao, 60) : null,
+                'situacao' => $podeVerDetalhes && $agendamento->jaIniciou() ? $agendamento->situacao->label() : null,
                 'url_detalhes' => $podeVerDetalhes ? route('agendamentos.show', $agendamento) : null,
                 'url_editar' => $user->can('update', $agendamento) ? route('agendamentos.edit', $agendamento) : null,
                 'url_cancelar' => $user->can('cancel', $agendamento) ? route('agendamentos.cancelar', $agendamento) : null,

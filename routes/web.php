@@ -47,6 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('agendamentos/{agendamento}/cancelar', [AgendamentoController::class, 'cancelar'])
         ->name('agendamentos.cancelar');
 
+    Route::patch('agendamentos/{agendamento}/atendimento', [AgendamentoController::class, 'registrarAtendimento'])
+        ->name('agendamentos.atendimento');
+
     /*
     |----------------------------------------------------------------------
     | Somente administrador

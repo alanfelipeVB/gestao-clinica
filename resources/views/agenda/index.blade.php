@@ -75,6 +75,8 @@
                         <dd class="col-8" data-campo="profissional"></dd>
                         <dt class="col-4 text-secondary fw-normal" data-bloco="descricao">Descrição</dt>
                         <dd class="col-8" data-bloco="descricao" data-campo="descricao" style="white-space: pre-line;"></dd>
+                        <dt class="col-4 text-secondary fw-normal" data-bloco="situacao">Atendimento</dt>
+                        <dd class="col-8" data-bloco="situacao" data-campo="situacao"></dd>
                     </dl>
                     <p class="text-secondary small mb-0" data-bloco="privado">
                         <i class="bi bi-lock me-1"></i>Horário reservado por outro profissional.

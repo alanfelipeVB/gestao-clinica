@@ -157,6 +157,8 @@ if (elemento) {
         campo('descricao').textContent = p.descricao ?? '';
 
         mostrar('descricao', p.descricao !== null);
+        campo('situacao').textContent = p.situacao ?? '';
+        mostrar('situacao', Boolean(p.situacao));
         mostrar('privado', p.descricao === null);
 
         mostrar('detalhes', Boolean(p.url_detalhes));

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SituacaoAtendimento;
 use App\Enums\StatusAgendamento;
 use App\Http\Requests\AgendamentoRequest;
 use App\Models\Agendamento;
@@ -27,6 +28,7 @@ class AgendamentoController extends Controller
         $filtros = $request->validate([
             'periodo' => ['nullable', Rule::in(['proximos', 'anteriores', 'todos'])],
             'status' => ['nullable', Rule::enum(StatusAgendamento::class)],
+            'situacao' => ['nullable', Rule::enum(SituacaoAtendimento::class)],
             'sala_id' => ['nullable', 'integer'],
             'user_id' => ['nullable', 'integer'],
             'data' => ['nullable', 'date_format:Y-m-d'],
@@ -41,6 +43,8 @@ class AgendamentoController extends Controller
             ->when($user->isAdmin() && ! empty($filtros['user_id']), fn ($q) => $q->where('user_id', $filtros['user_id']))
             ->when($filtros['sala_id'] ?? null, fn ($q, $salaId) => $q->where('sala_id', $salaId))
             ->when($filtros['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
+            // Situação do atendimento só faz sentido para agendamentos ativos já iniciados.
+            ->when($filtros['situacao'] ?? null, fn ($q, $situacao) => $q->agendados()->where('inicio', '<=', now())->where('situacao', $situacao))
             ->when($filtros['data'] ?? null, fn ($q, $data) => $q->whereDate('inicio', $data))
             ->when($periodo === 'proximos', fn ($q) => $q->where('fim', '>=', now())->orderBy('inicio'))
             ->when($periodo === 'anteriores', fn ($q) => $q->where('fim', '<', now())->orderByDesc('inicio'))
@@ -87,7 +91,7 @@ class AgendamentoController extends Controller
     {
         Gate::authorize('view', $agendamento);
 
-        $agendamento->load(['sala', 'profissional', 'criador', 'canceladoPor']);
+        $agendamento->load(['sala', 'profissional', 'criador', 'canceladoPor', 'situacaoMarcadaPor']);
 
         return view('agendamentos.show', ['agendamento' => $agendamento]);
     }
@@ -126,6 +130,27 @@ class AgendamentoController extends Controller
         return redirect()
             ->route('agendamentos.show', $agendamento)
             ->with('sucesso', 'Agendamento cancelado. O horário foi liberado.');
+    }
+
+    public function registrarAtendimento(Request $request, Agendamento $agendamento): RedirectResponse
+    {
+        Gate::authorize('registrarAtendimento', $agendamento);
+
+        $dados = $request->validate([
+            'situacao' => ['required', Rule::in([SituacaoAtendimento::Realizado->value, SituacaoAtendimento::NaoRealizado->value])],
+            'observacao_atendimento' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $situacao = SituacaoAtendimento::from($dados['situacao']);
+
+        $this->agendamentos->registrarAtendimento(
+            $agendamento,
+            $situacao,
+            $request->user(),
+            $dados['observacao_atendimento'] ?? null,
+        );
+
+        return back()->with('sucesso', "Atendimento registrado como \"{$situacao->label()}\".");
     }
 
     /**

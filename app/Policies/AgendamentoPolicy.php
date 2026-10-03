@@ -7,6 +7,9 @@ use App\Models\User;
 
 class AgendamentoPolicy
 {
+    /** Dias após o término em que o profissional ainda pode registrar/corrigir o atendimento. */
+    public const PRAZO_CORRECAO_DIAS = 7;
+
     public function viewAny(User $user): bool
     {
         return true;
@@ -49,6 +52,25 @@ class AgendamentoPolicy
         }
 
         return $this->ehDono($user, $agendamento) && ! $agendamento->jaIniciou();
+    }
+
+    /**
+     * Registro do atendimento (realizado / não realizado): a partir do início do agendamento.
+     * O profissional pode registrar ou corrigir até PRAZO_CORRECAO_DIAS após o término;
+     * depois disso, somente o administrador.
+     */
+    public function registrarAtendimento(User $user, Agendamento $agendamento): bool
+    {
+        if (! $agendamento->estaAgendado() || ! $agendamento->jaIniciou()) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return $this->ehDono($user, $agendamento)
+            && $agendamento->fim->copy()->addDays(self::PRAZO_CORRECAO_DIAS)->isFuture();
     }
 
     private function ehDono(User $user, Agendamento $agendamento): bool

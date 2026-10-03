@@ -27,6 +27,24 @@
         </div>
     </div>
 
+    @if ($totalPendentes > 0)
+        <div class="card mb-4 border-warning">
+            <div class="card-header bg-warning-subtle d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-clipboard-check me-1"></i>Atendimentos para confirmar</span>
+                <span class="badge text-bg-warning">{{ $totalPendentes }}</span>
+            </div>
+            <div class="card-body pb-0 small text-secondary">
+                Informe se cada atendimento foi realizado. Você tem até {{ \App\Policies\AgendamentoPolicy::PRAZO_CORRECAO_DIAS }} dias após o término.
+            </div>
+            <x-lista-agendamentos :agendamentos="$pendentes" :mostrar-data="true" :mostrar-profissional="false" />
+            @if ($totalPendentes > $pendentes->count())
+                <div class="card-footer bg-white text-end">
+                    <a href="{{ route('agendamentos.index', ['situacao' => 'pendente', 'periodo' => 'todos']) }}" class="small">Ver todos</a>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <div class="row g-3">
         <div class="col-lg-6">
             <div class="card h-100">

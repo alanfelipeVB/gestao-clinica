@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\SituacaoAtendimento;
 use App\Enums\StatusAgendamento;
 use App\Events\AgendamentoAtualizado;
 use App\Events\AgendamentoCancelado;
@@ -52,6 +53,7 @@ class AgendamentoService
                 'fim' => $dados['fim'],
                 'descricao' => $dados['descricao'],
                 'status' => StatusAgendamento::Agendado,
+                'situacao' => SituacaoAtendimento::Pendente,
                 'criado_por' => $autor->id,
             ]);
         });
@@ -127,6 +129,39 @@ class AgendamentoService
         ]);
 
         AgendamentoCancelado::dispatch($agendamento);
+
+        return $agendamento;
+    }
+
+    /**
+     * Registra o resultado do atendimento (realizado / não realizado).
+     *
+     * @throws RegraAgendamentoException
+     */
+    public function registrarAtendimento(
+        Agendamento $agendamento,
+        SituacaoAtendimento $situacao,
+        User $autor,
+        ?string $observacao = null,
+    ): Agendamento {
+        if ($situacao === SituacaoAtendimento::Pendente) {
+            throw new RegraAgendamentoException('Informe se o atendimento foi realizado ou não.', 'situacao');
+        }
+
+        if (! $agendamento->estaAgendado()) {
+            throw new RegraAgendamentoException('Agendamentos cancelados não têm atendimento a registrar.', 'situacao');
+        }
+
+        if (! $agendamento->jaIniciou()) {
+            throw new RegraAgendamentoException('O atendimento só pode ser registrado a partir do horário de início.', 'situacao');
+        }
+
+        $agendamento->update([
+            'situacao' => $situacao,
+            'situacao_marcada_por' => $autor->id,
+            'situacao_marcada_em' => now(),
+            'observacao_atendimento' => $observacao,
+        ]);
 
         return $agendamento;
     }

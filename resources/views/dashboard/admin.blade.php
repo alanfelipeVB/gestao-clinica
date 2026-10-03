@@ -30,6 +30,16 @@
         </div>
     </div>
 
+    @if ($totalPendentes > 0)
+        <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span>
+                <i class="bi bi-clipboard-check me-1"></i>
+                <strong>{{ $totalPendentes }}</strong> {{ $totalPendentes === 1 ? 'atendimento aguarda' : 'atendimentos aguardam' }} confirmação (realizado ou não).
+            </span>
+            <a href="{{ route('agendamentos.index', ['situacao' => 'pendente', 'periodo' => 'todos']) }}" class="btn btn-sm btn-warning">Ver pendentes</a>
+        </div>
+    @endif
+
     <div class="card mb-4">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <span class="fw-semibold"><i class="bi bi-broadcast me-1"></i>Agora nas salas</span>

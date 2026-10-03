@@ -74,6 +74,28 @@ class DashboardService
     }
 
     /**
+     * Atendimentos já iniciados que ainda não foram marcados como realizados ou não.
+     *
+     * @return Collection<int, Agendamento>
+     */
+    public function pendentesDeConfirmacao(User $profissional, int $limite = 10): Collection
+    {
+        return Agendamento::pendentesDeConfirmacao()
+            ->with(['sala:id,nome,cor', 'profissional:id,nome'])
+            ->where('user_id', $profissional->id)
+            ->orderByDesc('inicio')
+            ->limit($limite)
+            ->get();
+    }
+
+    public function totalPendentesDeConfirmacao(?User $profissional = null): int
+    {
+        return Agendamento::pendentesDeConfirmacao()
+            ->when($profissional, fn ($q) => $q->where('user_id', $profissional->id))
+            ->count();
+    }
+
+    /**
      * Próximos agendamentos a partir de amanhã.
      *
      * @return Collection<int, Agendamento>

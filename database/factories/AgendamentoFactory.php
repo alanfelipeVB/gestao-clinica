@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\SituacaoAtendimento;
 use App\Enums\StatusAgendamento;
 use App\Models\Agendamento;
 use App\Models\Sala;
@@ -28,6 +29,7 @@ class AgendamentoFactory extends Factory
             'fim' => $inicio->copy()->addHour(),
             'descricao' => fake()->sentence(),
             'status' => StatusAgendamento::Agendado,
+            'situacao' => SituacaoAtendimento::Pendente,
             'criado_por' => fn (array $attributes) => $attributes['user_id'],
         ];
     }
@@ -49,6 +51,25 @@ class AgendamentoFactory extends Factory
             'status' => StatusAgendamento::Cancelado,
             'cancelado_por' => fn (array $attributes) => $attributes['user_id'],
             'cancelado_em' => now(),
+        ]);
+    }
+
+    public function realizado(): static
+    {
+        return $this->comSituacao(SituacaoAtendimento::Realizado);
+    }
+
+    public function naoRealizado(): static
+    {
+        return $this->comSituacao(SituacaoAtendimento::NaoRealizado);
+    }
+
+    private function comSituacao(SituacaoAtendimento $situacao): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'situacao' => $situacao,
+            'situacao_marcada_por' => fn (array $attributes) => $attributes['user_id'],
+            'situacao_marcada_em' => now(),
         ]);
     }
 }

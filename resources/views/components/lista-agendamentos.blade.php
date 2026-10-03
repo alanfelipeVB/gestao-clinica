@@ -16,6 +16,10 @@
                         <div class="text-secondary">{{ ucfirst($agendamento->inicio->translatedFormat('D, d/m')) }}</div>
                     @endif
                     <div class="fw-semibold">{{ $agendamento->horario() }}</div>
+                    @if ($agendamento->jaIniciou())
+                        @php([$rotulo, $badge] = $agendamento->rotuloSituacao())
+                        <span class="badge {{ $badge }}" style="font-size: .65rem;">{{ $rotulo }}</span>
+                    @endif
                 </div>
                 <div class="flex-grow-1 small text-truncate">
                     <div class="fw-semibold text-truncate">{{ $agendamento->sala->nome }}</div>

@@ -26,7 +26,8 @@
                             <div class="text-secondary small">{{ ucfirst($agendamento->inicio->translatedFormat('l, d \d\e F \d\e Y')) }}</div>
                             <div class="fs-4 fw-semibold">{{ $agendamento->horario() }}</div>
                         </div>
-                        <span class="badge fs-6 {{ $agendamento->status->badge() }}">{{ $agendamento->status->label() }}</span>
+                        @php([$rotulo, $badge] = $agendamento->rotuloSituacao())
+                        <span class="badge fs-6 {{ $badge }}">{{ $rotulo }}</span>
                     </div>
 
                     <dl class="row mb-0">
@@ -57,10 +58,19 @@
                         Criado em {{ $agendamento->created_at->format('d/m/Y H:i') }}
                         por {{ $agendamento->criador->nome }}
                     </p>
-                    @if ($agendamento->updated_at->gt($agendamento->created_at) && $agendamento->estaAgendado())
+                    @if ($agendamento->updated_at->gt($agendamento->created_at) && $agendamento->estaAgendado()
+                        && ! $agendamento->situacao_marcada_em?->equalTo($agendamento->updated_at))
                         <p class="mb-2">
                             <i class="bi bi-pencil text-primary me-1"></i>
                             Atualizado em {{ $agendamento->updated_at->format('d/m/Y H:i') }}
+                        </p>
+                    @endif
+                    @if ($agendamento->situacao_marcada_em)
+                        <p class="mb-2">
+                            <i class="bi bi-clipboard-check text-primary me-1"></i>
+                            Atendimento marcado como "{{ $agendamento->situacao->label() }}"
+                            em {{ $agendamento->situacao_marcada_em->format('d/m/Y H:i') }}
+                            por {{ $agendamento->situacaoMarcadaPor->nome }}
                         </p>
                     @endif
                     @unless ($agendamento->estaAgendado())
@@ -76,6 +86,52 @@
                 </div>
             </div>
         </div>
+
+        @if ($agendamento->estaAgendado() && $agendamento->jaIniciou())
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white fw-semibold">
+                        <i class="bi bi-clipboard-check me-1"></i>Atendimento
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2">
+                            Situação:
+                            <span class="badge {{ $agendamento->situacao->badge() }}">{{ $agendamento->situacao->label() }}</span>
+                        </p>
+                        @if ($agendamento->observacao_atendimento)
+                            <p class="text-secondary small mb-3">Observação: {{ $agendamento->observacao_atendimento }}</p>
+                        @endif
+
+                        @can('registrarAtendimento', $agendamento)
+                            <form method="POST" action="{{ route('agendamentos.atendimento', $agendamento) }}" class="row g-2 align-items-end">
+                                @csrf
+                                @method('PATCH')
+                                <div class="col-12 col-md">
+                                    <label for="observacao_atendimento" class="form-label small mb-1">Observação (opcional)</label>
+                                    <input type="text" id="observacao_atendimento" name="observacao_atendimento" maxlength="255"
+                                           value="{{ old('observacao_atendimento', $agendamento->observacao_atendimento) }}"
+                                           class="form-control" placeholder="Ex.: paciente faltou, atendimento remarcado...">
+                                </div>
+                                <div class="col-12 col-md-auto d-flex gap-2">
+                                    <button type="submit" name="situacao" value="realizado" class="btn btn-primary flex-grow-1">
+                                        <i class="bi bi-check2-circle me-1"></i>Realizado
+                                    </button>
+                                    <button type="submit" name="situacao" value="nao_realizado" class="btn btn-outline-danger flex-grow-1">
+                                        <i class="bi bi-x-circle me-1"></i>Não realizado
+                                    </button>
+                                </div>
+                            </form>
+                        @else
+                            @if ($agendamento->situacao === \App\Enums\SituacaoAtendimento::Pendente)
+                                <p class="text-secondary small mb-0">
+                                    O prazo para o profissional registrar este atendimento terminou. Procure o administrador.
+                                </p>
+                            @endif
+                        @endcan
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     @can('cancel', $agendamento)

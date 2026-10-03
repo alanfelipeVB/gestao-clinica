@@ -153,6 +153,12 @@ Verificação e gravação ocorrem dentro de uma transação, com `lockForUpdate
 ### 4.7 Privacidade na agenda
 O profissional vê os agendamentos de colegas apenas como **"Ocupado — nome do profissional"**, sem a descrição (que pode conter dados de paciente). Administrador e o próprio dono veem todos os detalhes.
 
+### 4.8 Registro do atendimento
+- Todo agendamento tem uma **situação**: `pendente` (padrão), `realizado` ou `nao_realizado`, com quem marcou, quando e observação opcional.
+- Só pode ser registrada a partir do **horário de início** e apenas em agendamentos ativos (não cancelados).
+- O profissional registra/corrige os próprios atendimentos até **7 dias após o término**; depois disso, somente o administrador.
+- Agendamentos iniciados e ainda pendentes aparecem em "Atendimentos para confirmar" (dashboard do profissional) e em um aviso no dashboard do administrador.
+
 ## 5. Autenticação
 - Login por e-mail e senha usando o `Auth` nativo do Laravel (sem pacote de starter kit).
 - Sem cadastro público: contas são criadas pelo administrador.

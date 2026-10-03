@@ -54,7 +54,16 @@
                         @endforeach
                     </select>
                 </div>
-                <div @class(['col-12 d-flex gap-2', 'col-md-4 col-xl-2' => $ehAdmin, 'col-md-8 col-xl-4' => ! $ehAdmin])>
+                <div class="col-6 col-md-4 col-xl-2">
+                    <label for="situacao" class="form-label small text-secondary mb-1">Atendimento</label>
+                    <select id="situacao" name="situacao" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach (\App\Enums\SituacaoAtendimento::cases() as $situacao)
+                            <option value="{{ $situacao->value }}" @selected(($filtros['situacao'] ?? '') === $situacao->value)>{{ $situacao->label() }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div @class(['col-12 d-flex gap-2', 'col-md-8 col-xl-12 justify-content-xl-end' => $ehAdmin, 'col-md-4 col-xl-2' => ! $ehAdmin])>
                     <button type="submit" class="btn btn-outline-primary flex-grow-1">
                         <i class="bi bi-search me-1"></i>Filtrar
                     </button>
@@ -77,7 +86,7 @@
                             <th class="d-none d-md-table-cell">Profissional</th>
                         @endif
                         <th class="d-none d-xl-table-cell">Descrição</th>
-                        <th class="d-none d-sm-table-cell">Status</th>
+                        <th class="d-none d-sm-table-cell">Situação</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
@@ -98,14 +107,14 @@
                                 @endif
                                 {{-- Em telas pequenas, o status aparece aqui. --}}
                                 <div class="d-sm-none">
-                                    <span class="badge {{ $agendamento->status->badge() }}">{{ $agendamento->status->label() }}</span>
+                                    <span class="badge {{ $agendamento->rotuloSituacao()[1] }}">{{ $agendamento->rotuloSituacao()[0] }}</span>
                                 </div>
                             </td>
                             @if ($ehAdmin)
                                 <td class="d-none d-md-table-cell">{{ $agendamento->profissional->nome }}</td>
                             @endif
                             <td class="d-none d-xl-table-cell small">{{ Str::limit($agendamento->descricao, 60) }}</td>
-                            <td class="d-none d-sm-table-cell"><span class="badge {{ $agendamento->status->badge() }}">{{ $agendamento->status->label() }}</span></td>
+                            <td class="d-none d-sm-table-cell"><span class="badge {{ $agendamento->rotuloSituacao()[1] }}">{{ $agendamento->rotuloSituacao()[0] }}</span></td>
                             <td class="text-end text-nowrap">
                                 <a href="{{ route('agendamentos.show', $agendamento) }}" class="btn btn-sm btn-outline-secondary"
                                    title="Detalhes" data-bs-toggle="tooltip">

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\SituacaoAtendimento;
 use App\Enums\StatusAgendamento;
 use App\Models\Agendamento;
 use App\Models\Sala;
@@ -89,6 +90,8 @@ class DemonstracaoSeeder extends Seeder
                         continue;
                     }
 
+                    $situacao = $this->situacaoDeExemplo($fim, $d + $s + $f);
+
                     Agendamento::create([
                         'user_id' => $profissional->id,
                         'sala_id' => $sala->id,
@@ -96,6 +99,9 @@ class DemonstracaoSeeder extends Seeder
                         'fim' => $fim,
                         'descricao' => self::DESCRICOES[($d + $s + $f) % count(self::DESCRICOES)],
                         'status' => StatusAgendamento::Agendado,
+                        'situacao' => $situacao,
+                        'situacao_marcada_por' => $situacao === SituacaoAtendimento::Pendente ? null : $profissional->id,
+                        'situacao_marcada_em' => $situacao === SituacaoAtendimento::Pendente ? null : $fim,
                         'criado_por' => $profissional->id,
                     ]);
 
@@ -105,6 +111,23 @@ class DemonstracaoSeeder extends Seeder
         }
 
         $this->command?->info("Demonstração: {$profissionais->count()} profissionais e {$criados} agendamentos criados.");
+    }
+
+    /**
+     * Agendamentos já encerrados recebem um resultado variado: a maioria realizados,
+     * alguns não realizados e alguns ainda pendentes de confirmação.
+     */
+    public static function situacaoDeExemplo(Carbon $fim, int $semente): SituacaoAtendimento
+    {
+        if ($fim->isFuture()) {
+            return SituacaoAtendimento::Pendente;
+        }
+
+        return match ($semente % 7) {
+            0 => SituacaoAtendimento::NaoRealizado,
+            1 => SituacaoAtendimento::Pendente,
+            default => SituacaoAtendimento::Realizado,
+        };
     }
 
     /**

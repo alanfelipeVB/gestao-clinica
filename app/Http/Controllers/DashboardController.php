@@ -18,12 +18,15 @@ class DashboardController extends Controller
                 'salas' => $dashboard->situacaoDasSalas(),
                 'hoje' => $dashboard->agendamentosDeHoje(),
                 'proximos' => $dashboard->proximosAgendamentos(),
+                'totalPendentes' => $dashboard->totalPendentesDeConfirmacao(),
             ]);
         }
 
         return view('dashboard.profissional', [
             'hoje' => $dashboard->agendamentosDeHoje($user),
             'proximos' => $dashboard->proximosAgendamentos($user, dias: 30),
+            'pendentes' => $dashboard->pendentesDeConfirmacao($user),
+            'totalPendentes' => $dashboard->totalPendentesDeConfirmacao($user),
         ]);
     }
 }
