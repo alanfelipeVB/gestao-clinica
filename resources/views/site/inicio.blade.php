@@ -11,11 +11,9 @@
         @if ($textos['site_sobre'])
             <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
         @endif
-        @isset($profissionais)
-            @if ($profissionais->isNotEmpty())
-                <li class="nav-item"><a class="nav-link" href="#profissionais">Profissionais</a></li>
-            @endif
-        @endisset
+        @if ($profissionais->isNotEmpty())
+            <li class="nav-item"><a class="nav-link" href="#profissionais">Equipe</a></li>
+        @endif
         @if ($temContato)
             <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
         @endif
@@ -34,11 +32,9 @@
                                 <i class="bi bi-whatsapp me-1 text-success"></i>Fale conosco
                             </a>
                         @endif
-                        @isset($profissionais)
-                            @if ($profissionais->isNotEmpty())
-                                <a href="#profissionais" class="btn btn-outline-light btn-lg">Conheça a equipe</a>
-                            @endif
-                        @endisset
+                        @if ($profissionais->isNotEmpty())
+                            <a href="#profissionais" class="btn btn-outline-light btn-lg">Conheça a equipe</a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -54,6 +50,62 @@
                         <h2 class="h3 mb-3">Sobre a clínica</h2>
                         <p class="text-secondary fs-5 mb-0" style="white-space: pre-line;">{{ $textos['site_sobre'] }}</p>
                     </div>
+                </div>
+            </div>
+        </section>
+    @endif
+
+    {{-- Equipe --}}
+    @if ($profissionais->isNotEmpty())
+        <section id="profissionais" class="py-5 bg-body-tertiary border-top">
+            <div class="container">
+                <h2 class="h3 mb-1 text-center">Nossa equipe</h2>
+                <p class="text-secondary text-center mb-4">Conheça os profissionais da {{ $textos['site_nome'] }}.</p>
+
+                <div class="row g-4 justify-content-center">
+                    @foreach ($profissionais as $profissional)
+                        @php
+                            $whatsapp = Whatsapp::link(
+                                $profissional->whatsappPublico(),
+                                "Olá, {$profissional->primeiroNome()}! Vim pelo site da {$textos['site_nome']} e gostaria de agendar um atendimento.",
+                            );
+                        @endphp
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            <div class="card h-100 text-center">
+                                <div class="card-body d-flex flex-column align-items-center">
+                                    @if ($profissional->urlFoto())
+                                        <img src="{{ $profissional->urlFoto() }}" alt="Foto de {{ $profissional->nome }}"
+                                             class="rounded-circle mb-3 border" style="width: 7.5rem; height: 7.5rem; object-fit: cover;" loading="lazy">
+                                    @else
+                                        <span class="rounded-circle bg-primary-subtle text-primary-emphasis d-inline-flex align-items-center justify-content-center fs-2 fw-semibold mb-3"
+                                              style="width: 7.5rem; height: 7.5rem;" aria-hidden="true">{{ $profissional->iniciais() }}</span>
+                                    @endif
+
+                                    <h3 class="h5 mb-0">{{ $profissional->nome }}</h3>
+                                    @if ($profissional->profissao)
+                                        <div class="text-primary small fw-semibold mb-2">{{ $profissional->profissao }}</div>
+                                    @endif
+                                    @if ($profissional->bio)
+                                        <p class="text-secondary small mb-3" style="white-space: pre-line;">{{ $profissional->bio }}</p>
+                                    @endif
+
+                                    <div class="mt-auto d-flex flex-wrap justify-content-center gap-2">
+                                        @if ($whatsapp)
+                                            <a href="{{ $whatsapp }}" target="_blank" rel="noopener" class="btn btn-success btn-sm">
+                                                <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                                            </a>
+                                        @endif
+                                        @if ($profissional->instagram)
+                                            <a href="https://instagram.com/{{ $profissional->instagram }}" target="_blank" rel="noopener"
+                                               class="btn btn-outline-secondary btn-sm" aria-label="Instagram de {{ $profissional->nome }}">
+                                                <i class="bi bi-instagram me-1"></i>{{ '@'.$profissional->instagram }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </section>

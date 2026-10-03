@@ -6,6 +6,11 @@ Arquitetura, modelo de dados e regras de negócio em detalhes: [docs/ARQUITETURA
 
 ## Funcionalidades
 
+**Página inicial pública** (`/`)
+- Logo, textos e contatos da clínica editáveis pelo administrador
+- Seção "Nossa equipe" com foto, profissão, mini biografia, Instagram e botão de WhatsApp (somente para quem autorizou)
+- O sistema fica em `/login`
+
 **Administrador**
 - Dashboard com totais, situação das salas em tempo real (ocupada/livre), agendamentos do dia e dos próximos 7 dias
 - Cadastro, edição, ativação/desativação e redefinição de senha de profissionais (inclusive outros administradores)
@@ -24,7 +29,7 @@ Arquitetura, modelo de dados e regras de negócio em detalhes: [docs/ARQUITETURA
 - Assiste aos tutoriais publicados e marca como assistido
 - Relatório mensal com os próprios números
 - Na agenda, vê horários de colegas apenas como "Ocupado — nome" (sem descrição)
-- Página "Meu perfil" com dados pessoais e troca de senha
+- Página "Meu perfil" com dados pessoais, foto, mini biografia, autorização para publicar o WhatsApp no site e troca de senha
 
 **Agenda visual**
 - Visões de dia, semana, mês e lista (padrão no celular), em português

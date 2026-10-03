@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProfissionalRequest;
 use App\Models\User;
 use App\Services\AgendamentoService;
+use App\Services\FotoPerfilService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -44,9 +45,10 @@ class ProfissionalController extends Controller
         ]);
     }
 
-    public function store(ProfissionalRequest $request): RedirectResponse
+    public function store(ProfissionalRequest $request, FotoPerfilService $fotos): RedirectResponse
     {
         $profissional = User::create([...$request->dados(), 'ativo' => true]);
+        $fotos->aplicar($profissional, $request->file('foto'), false);
 
         return redirect()
             ->route('admin.profissionais.index')
@@ -60,9 +62,10 @@ class ProfissionalController extends Controller
         ]);
     }
 
-    public function update(ProfissionalRequest $request, User $profissional): RedirectResponse
+    public function update(ProfissionalRequest $request, User $profissional, FotoPerfilService $fotos): RedirectResponse
     {
         $profissional->update($request->dados());
+        $fotos->aplicar($profissional, $request->file('foto'), $request->boolean('remover_foto'));
 
         $mensagem = $request->filled('password')
             ? "Dados de {$profissional->nome} atualizados e senha redefinida."

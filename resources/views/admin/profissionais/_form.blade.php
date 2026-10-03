@@ -90,6 +90,31 @@
     </div>
 </div>
 
+<div class="card mb-3">
+    <div class="card-header bg-white fw-semibold">Página inicial</div>
+    <div class="card-body">
+        <div class="form-check form-switch mb-3">
+            <input type="hidden" name="exibir_no_site" value="0">
+            <input class="form-check-input" type="checkbox" role="switch" id="exibir_no_site" name="exibir_no_site" value="1"
+                   @checked(old('exibir_no_site', $profissional->exibir_no_site))>
+            <label class="form-check-label" for="exibir_no_site">Exibir este profissional na página inicial</label>
+        </div>
+
+        <x-foto-e-bio :user="$profissional" />
+
+        @if ($editando)
+            <p class="small text-secondary mt-3 mb-0">
+                <i class="bi bi-whatsapp me-1"></i>
+                @if ($profissional->publicar_whatsapp)
+                    O profissional <strong>autorizou</strong> a publicação do WhatsApp ({{ $profissional->telefone ?: 'sem telefone cadastrado' }}).
+                @else
+                    O profissional <strong>não autorizou</strong> a publicação do WhatsApp. Só ele pode alterar isso, em "Meu perfil".
+                @endif
+            </p>
+        @endif
+    </div>
+</div>
+
 <div class="d-flex justify-content-end gap-2">
     <a href="{{ route('admin.profissionais.index') }}" class="btn btn-light">Cancelar</a>
     <button type="submit" class="btn btn-primary">

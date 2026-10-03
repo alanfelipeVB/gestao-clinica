@@ -3,7 +3,7 @@
 
     <div class="row g-3">
         <div class="col-lg-7">
-            <form method="POST" action="{{ route('perfil.update') }}" class="card h-100" novalidate>
+            <form method="POST" action="{{ route('perfil.update') }}" class="card h-100" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PUT')
                 <div class="card-header bg-white fw-semibold">Dados pessoais</div>
@@ -47,6 +47,37 @@
                         </div>
                     </div>
                 </div>
+
+                @if ($user->isProfissional())
+                    <div class="card-body border-top">
+                        <h2 class="h6 mb-1">Página inicial da clínica</h2>
+                        <p class="small text-secondary mb-3">
+                            @if ($user->exibir_no_site)
+                                <i class="bi bi-check-circle text-success me-1"></i>Você aparece na página inicial.
+                                <a href="{{ route('inicio') }}#profissionais" target="_blank" rel="noopener">Ver</a>
+                            @else
+                                <i class="bi bi-eye-slash me-1"></i>Você ainda não aparece na página inicial; quem decide é o administrador.
+                                Mesmo assim, já pode preencher sua foto e biografia.
+                            @endif
+                        </p>
+
+                        <x-foto-e-bio :user="$user" />
+
+                        <div class="form-check form-switch mt-3">
+                            <input type="hidden" name="publicar_whatsapp" value="0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="publicar_whatsapp" name="publicar_whatsapp" value="1"
+                                   @checked(old('publicar_whatsapp', $user->publicar_whatsapp))>
+                            <label class="form-check-label" for="publicar_whatsapp">
+                                Publicar meu WhatsApp na página inicial
+                            </label>
+                            <div class="form-text">
+                                Os visitantes poderão iniciar uma conversa com o número do campo "Telefone" acima.
+                                Desmarque a qualquer momento para remover.
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="card-footer bg-white text-end">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg me-1"></i>Salvar dados

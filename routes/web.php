@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', [SiteController::class, 'inicio'])->name('inicio');
 Route::get('/marca/logo', [SiteController::class, 'logo'])->name('site.logo');
+Route::get('/profissionais/{user}/foto', [SiteController::class, 'foto'])->name('profissionais.foto');
 
 /*
 |--------------------------------------------------------------------------

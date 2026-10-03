@@ -42,6 +42,19 @@ class ProfissionalRequest extends FormRequest
             'profissao' => ['nullable', 'string', 'max:100'],
             'perfil' => ['required', Rule::enum(PerfilUsuario::class)],
             'password' => [$profissional ? 'nullable' : 'required', 'confirmed', Password::min(8)],
+            // Página inicial. "Publicar WhatsApp" é decisão do próprio profissional (Meu perfil).
+            'bio' => ['nullable', 'string', 'max:500'],
+            'exibir_no_site' => ['nullable', 'boolean'],
+            'foto' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
+            'remover_foto' => ['nullable', 'boolean'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'bio' => 'mini biografia',
+            'foto' => 'foto',
         ];
     }
 
@@ -50,6 +63,7 @@ class ProfissionalRequest extends FormRequest
         return [
             'telefone.regex' => 'O telefone deve conter apenas números, espaços, parênteses, + e -.',
             'instagram.regex' => 'O instagram deve conter apenas letras, números, ponto e sublinhado.',
+            'foto.max' => 'A foto pode ter no máximo 2 MB.',
         ];
     }
 
@@ -76,7 +90,9 @@ class ProfissionalRequest extends FormRequest
      */
     public function dados(): array
     {
-        $dados = $this->safe()->except('password');
+        // A foto é gravada à parte pelo FotoPerfilService.
+        $dados = $this->safe()->except(['password', 'foto', 'remover_foto']);
+        $dados['exibir_no_site'] = $this->boolean('exibir_no_site');
 
         if ($this->filled('password')) {
             $dados['password'] = $this->input('password');

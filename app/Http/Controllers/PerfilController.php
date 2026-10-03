@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PerfilRequest;
+use App\Services\FotoPerfilService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
@@ -15,9 +16,10 @@ class PerfilController extends Controller
         return view('perfil.edit', ['user' => $request->user()]);
     }
 
-    public function update(PerfilRequest $request): RedirectResponse
+    public function update(PerfilRequest $request, FotoPerfilService $fotos): RedirectResponse
     {
-        $request->user()->update($request->validated());
+        $request->user()->update($request->dados());
+        $fotos->aplicar($request->user(), $request->file('foto'), $request->boolean('remover_foto'));
 
         return redirect()->route('perfil.edit')->with('sucesso', 'Seus dados foram atualizados.');
     }

@@ -174,6 +174,13 @@ O profissional vê os agendamentos de colegas apenas como **"Ocupado — nome do
 - Cada usuário pode marcar/desmarcar um tutorial como assistido (`tutorial_visualizacoes`); o administrador vê quem assistiu.
 - O limite de upload também depende do PHP (`upload_max_filesize` e `post_max_size`) e do servidor web.
 
+### 4.11 Página inicial pública
+- `/` é a página pública da clínica; o sistema fica em `/login`.
+- O administrador edita logo, nome, textos e contatos (guardados em `configuracoes` com prefixo `site_`; logo no disco privado, servida pela rota pública `site.logo`).
+- A seção "Nossa equipe" mostra profissionais **ativos** com `exibir_no_site` (controlado só pelo administrador).
+- O WhatsApp do profissional (campo telefone) só é publicado com `publicar_whatsapp`, **consentimento dado pelo próprio profissional** em "Meu perfil".
+- Foto (disco privado) e mini biografia podem ser editadas pelo administrador e pelo profissional. A rota `profissionais.foto` é pública apenas para quem aparece no site; nos demais casos, só o administrador e o próprio profissional acessam.
+
 ## 5. Autenticação
 - Login por e-mail e senha usando o `Auth` nativo do Laravel (sem pacote de starter kit).
 - Sem cadastro público: contas são criadas pelo administrador.

@@ -68,6 +68,9 @@
                                     @if ($profissional->isAdmin())
                                         <span class="badge text-bg-primary ms-1">Admin</span>
                                     @endif
+                                    @if ($profissional->exibir_no_site)
+                                        <span class="badge text-bg-info ms-1" title="Exibido na página inicial">No site</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="d-none d-md-table-cell small">
