@@ -30,18 +30,19 @@ class AgendamentoService
     }
 
     /**
-     * @param  array{user_id: int, sala_id: int, inicio: Carbon, fim: Carbon, descricao: string}  $dados
+     * @param  array{user_id: int, sala_id: int, inicio: Carbon, fim: Carbon, descricao: string, recorrencia_id?: int}  $dados
+     * @param  Carbon|null  $dataLimite  limite de antecedência diferente do padrão (usado pela recorrência)
      *
      * @throws RegraAgendamentoException
      */
-    public function criar(array $dados, User $autor): Agendamento
+    public function criar(array $dados, User $autor, ?Carbon $dataLimite = null): Agendamento
     {
         $profissional = User::findOrFail($dados['user_id']);
         $sala = Sala::findOrFail($dados['sala_id']);
 
         $this->validarProfissional($profissional);
         $this->validarSala($sala);
-        $this->validarHorario($dados['inicio'], $dados['fim']);
+        $this->validarHorario($dados['inicio'], $dados['fim'], $dataLimite);
 
         $agendamento = DB::transaction(function () use ($dados, $profissional, $sala, $autor) {
             $this->bloquearEVerificarConflitos($sala->id, $profissional->id, $dados['inicio'], $dados['fim']);
@@ -49,6 +50,7 @@ class AgendamentoService
             return Agendamento::create([
                 'user_id' => $profissional->id,
                 'sala_id' => $sala->id,
+                'recorrencia_id' => $dados['recorrencia_id'] ?? null,
                 'inicio' => $dados['inicio'],
                 'fim' => $dados['fim'],
                 'descricao' => $dados['descricao'],
@@ -182,6 +184,42 @@ class AgendamentoService
     }
 
     /**
+     * Cancela este agendamento e os próximos da mesma série que o autor pode cancelar.
+     *
+     * @return int quantidade cancelada
+     */
+    public function cancelarEsteEProximos(Agendamento $agendamento, User $autor, ?string $motivo = null): int
+    {
+        if (! $agendamento->recorrencia_id) {
+            $this->cancelar($agendamento, $autor, $motivo);
+
+            return 1;
+        }
+
+        $serie = Agendamento::query()
+            ->agendados()
+            ->where('recorrencia_id', $agendamento->recorrencia_id)
+            ->where('inicio', '>=', $agendamento->inicio)
+            ->orderBy('inicio')
+            ->get()
+            ->filter(fn (Agendamento $a) => $autor->can('cancel', $a));
+
+        return DB::transaction(function () use ($serie, $autor, $motivo) {
+            $serie->each(fn (Agendamento $a) => $this->cancelar($a, $autor, $motivo));
+
+            return $serie->count();
+        });
+    }
+
+    /**
+     * Último dia em que uma série recorrente pode gerar agendamentos.
+     */
+    public function dataLimiteRecorrencia(): Carbon
+    {
+        return today()->addDays($this->configuracoes->antecedenciaRecorrenciaDias());
+    }
+
+    /**
      * Horários selecionáveis no formulário (00:00, 00:15, ..., 23:45).
      *
      * @return list<string>
@@ -263,7 +301,12 @@ class AgendamentoService
         }
     }
 
-    private function validarHorario(Carbon $inicio, Carbon $fim): void
+    /**
+     * Regras de horário de um agendamento (sem conflitos). Público para a prévia da recorrência.
+     *
+     * @throws RegraAgendamentoException
+     */
+    public function validarHorario(Carbon $inicio, Carbon $fim, ?Carbon $dataLimite = null): void
     {
         if (! $inicio->isSameDay($fim)) {
             throw new RegraAgendamentoException('O agendamento deve começar e terminar no mesmo dia.', 'hora_fim');
@@ -286,11 +329,13 @@ class AgendamentoService
             throw new RegraAgendamentoException('Não é possível agendar em um horário que já passou.', 'hora_inicio');
         }
 
-        $limite = $this->dataLimite();
+        $limite = $dataLimite ?? $this->dataLimite();
 
         if ($inicio->copy()->startOfDay()->greaterThan($limite)) {
+            $dias = (int) today()->diffInDays($limite);
+
             throw new RegraAgendamentoException(
-                "É possível agendar com até {$this->configuracoes->antecedenciaMaximaDias()} dias de antecedência (até {$limite->format('d/m/Y')}).",
+                "É possível agendar com até {$dias} dias de antecedência (até {$limite->format('d/m/Y')}).",
                 'data',
             );
         }

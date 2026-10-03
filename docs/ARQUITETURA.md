@@ -159,6 +159,14 @@ O profissional vê os agendamentos de colegas apenas como **"Ocupado — nome do
 - O profissional registra/corrige os próprios atendimentos até **7 dias após o término**; depois disso, somente o administrador.
 - Agendamentos iniciados e ainda pendentes aparecem em "Atendimentos para confirmar" (dashboard do profissional) e em um aviso no dashboard do administrador.
 
+### 4.9 Agendamento recorrente
+- Frequências: semanal, quinzenal e mensal (mesmo dia do mês; meses sem esse dia são pulados).
+- Término por data final ou número de ocorrências (máximo de 52).
+- Limite próprio: `antecedencia_recorrencia_dias` (padrão 90), configurável pelo administrador.
+- Antes de criar, o sistema mostra a **prévia** de cada data (livre, conflito ou não será criada). Só as livres são criadas; cada ocorrência é um agendamento comum, criado pelo `AgendamentoService` com todas as regras e a trava de concorrência.
+- A série é guardada em `recorrencias`; cada agendamento aponta para ela (`recorrencia_id`).
+- Cancelamento: "somente este" ou "este e os próximos da série". A edição continua individual.
+
 ## 5. Autenticação
 - Login por e-mail e senha usando o `Auth` nativo do Laravel (sem pacote de starter kit).
 - Sem cadastro público: contas são criadas pelo administrador.

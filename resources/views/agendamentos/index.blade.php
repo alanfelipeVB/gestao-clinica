@@ -13,6 +13,9 @@
     <div class="card mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('agendamentos.index') }}" class="row g-2 align-items-end">
+                @if (! empty($filtros['recorrencia_id']))
+                    <input type="hidden" name="recorrencia_id" value="{{ $filtros['recorrencia_id'] }}">
+                @endif
                 <div class="col-6 col-md-4 col-xl-2">
                     <label for="periodo" class="form-label small text-secondary mb-1">Período</label>
                     <select id="periodo" name="periodo" class="form-select">
@@ -75,6 +78,13 @@
         </div>
     </div>
 
+    @if (! empty($filtros['recorrencia_id']))
+        <div class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span><i class="bi bi-arrow-repeat me-1"></i>Mostrando os agendamentos de uma série recorrente.</span>
+            <a href="{{ route('agendamentos.index', Arr::except($filtros, 'recorrencia_id')) }}" class="btn btn-sm btn-outline-secondary">Ver todos os agendamentos</a>
+        </div>
+    @endif
+
     <div class="card">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -94,7 +104,12 @@
                     @forelse ($agendamentos as $agendamento)
                         <tr @class(['text-secondary' => ! $agendamento->estaAgendado()])>
                             <td class="text-nowrap">
-                                <div class="small text-secondary">{{ $agendamento->inicio->format('d/m/Y') }}</div>
+                                <div class="small text-secondary">
+                                    {{ $agendamento->inicio->format('d/m/Y') }}
+                                    @if ($agendamento->recorrencia_id)
+                                        <i class="bi bi-arrow-repeat" title="Agendamento recorrente" aria-label="Agendamento recorrente"></i>
+                                    @endif
+                                </div>
                                 <div class="fw-semibold">{{ $agendamento->horario() }}</div>
                             </td>
                             <td>

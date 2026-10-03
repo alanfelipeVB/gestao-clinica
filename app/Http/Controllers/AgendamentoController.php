@@ -9,6 +9,7 @@ use App\Models\Agendamento;
 use App\Models\Sala;
 use App\Models\User;
 use App\Services\AgendamentoService;
+use App\Services\RecorrenciaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -17,8 +18,10 @@ use Illuminate\View\View;
 
 class AgendamentoController extends Controller
 {
-    public function __construct(private readonly AgendamentoService $agendamentos)
-    {
+    public function __construct(
+        private readonly AgendamentoService $agendamentos,
+        private readonly RecorrenciaService $recorrencias,
+    ) {
     }
 
     public function index(Request $request): View
@@ -32,6 +35,7 @@ class AgendamentoController extends Controller
             'sala_id' => ['nullable', 'integer'],
             'user_id' => ['nullable', 'integer'],
             'data' => ['nullable', 'date_format:Y-m-d'],
+            'recorrencia_id' => ['nullable', 'integer'],
         ]);
 
         $periodo = $filtros['periodo'] ?? 'proximos';
@@ -46,9 +50,12 @@ class AgendamentoController extends Controller
             // Situação do atendimento só faz sentido para agendamentos ativos já iniciados.
             ->when($filtros['situacao'] ?? null, fn ($q, $situacao) => $q->agendados()->where('inicio', '<=', now())->where('situacao', $situacao))
             ->when($filtros['data'] ?? null, fn ($q, $data) => $q->whereDate('inicio', $data))
+            ->when($filtros['recorrencia_id'] ?? null, fn ($q, $id) => $q->where('recorrencia_id', $id))
             ->when($periodo === 'proximos', fn ($q) => $q->where('fim', '>=', now())->orderBy('inicio'))
             ->when($periodo === 'anteriores', fn ($q) => $q->where('fim', '<', now())->orderByDesc('inicio'))
             ->when($periodo === 'todos', fn ($q) => $q->orderByDesc('inicio'))
+            // Uma série é lida em ordem cronológica.
+            ->when($filtros['recorrencia_id'] ?? null, fn ($q) => $q->reorder('inicio'))
             ->paginate(20)
             ->withQueryString();
 
@@ -76,9 +83,13 @@ class AgendamentoController extends Controller
         ]);
     }
 
-    public function store(AgendamentoRequest $request): RedirectResponse
+    public function store(AgendamentoRequest $request): RedirectResponse|View
     {
         Gate::authorize('create', Agendamento::class);
+
+        if ($request->repeteSerie()) {
+            return $this->criarSerie($request);
+        }
 
         $agendamento = $this->agendamentos->criar($request->dados(), $request->user());
 
@@ -91,7 +102,7 @@ class AgendamentoController extends Controller
     {
         Gate::authorize('view', $agendamento);
 
-        $agendamento->load(['sala', 'profissional', 'criador', 'canceladoPor', 'situacaoMarcadaPor']);
+        $agendamento->load(['sala', 'profissional', 'criador', 'canceladoPor', 'situacaoMarcadaPor', 'recorrencia']);
 
         return view('agendamentos.show', ['agendamento' => $agendamento]);
     }
@@ -123,13 +134,57 @@ class AgendamentoController extends Controller
 
         $dados = $request->validate([
             'motivo_cancelamento' => ['nullable', 'string', 'max:255'],
+            'escopo' => ['nullable', Rule::in(['este', 'proximos'])],
         ]);
 
-        $this->agendamentos->cancelar($agendamento, $request->user(), $dados['motivo_cancelamento'] ?? null);
+        $motivo = $dados['motivo_cancelamento'] ?? null;
+
+        if (($dados['escopo'] ?? 'este') === 'proximos' && $agendamento->recorrencia_id) {
+            $total = $this->agendamentos->cancelarEsteEProximos($agendamento, $request->user(), $motivo);
+            $mensagem = "{$total} agendamento(s) da série cancelado(s). Os horários foram liberados.";
+        } else {
+            $this->agendamentos->cancelar($agendamento, $request->user(), $motivo);
+            $mensagem = 'Agendamento cancelado. O horário foi liberado.';
+        }
 
         return redirect()
             ->route('agendamentos.show', $agendamento)
-            ->with('sucesso', 'Agendamento cancelado. O horário foi liberado.');
+            ->with('sucesso', $mensagem);
+    }
+
+    /**
+     * Sem "confirmado": mostra a prévia das datas. Com "confirmado": cria as ocorrências livres.
+     */
+    private function criarSerie(AgendamentoRequest $request): RedirectResponse|View
+    {
+        $dados = $request->dados();
+        $serie = $request->dadosRecorrencia();
+
+        if (! $request->boolean('confirmado')) {
+            $previa = $this->recorrencias->previa($dados, $serie);
+
+            return view('agendamentos.previa', [
+                'previa' => $previa,
+                'serie' => $serie,
+                'dados' => $dados,
+                'sala' => Sala::findOrFail($dados['sala_id']),
+                'profissional' => User::findOrFail($dados['user_id']),
+                'entrada' => $request->safe()->except('confirmado'),
+                'livres' => $previa->where('situacao', RecorrenciaService::LIVRE)->count(),
+            ]);
+        }
+
+        $resultado = $this->recorrencias->criar($dados, $serie, $request->user());
+        $criados = $resultado['criados']->count();
+
+        $mensagem = "Série criada: {$criados} agendamento(s).";
+        if ($resultado['ignorados'] > 0) {
+            $mensagem .= " {$resultado['ignorados']} data(s) ficaram de fora por conflito ou restrição.";
+        }
+
+        return redirect()
+            ->route('agendamentos.index', ['recorrencia_id' => $resultado['recorrencia']->id, 'periodo' => 'todos'])
+            ->with('sucesso', $mensagem);
     }
 
     public function registrarAtendimento(Request $request, Agendamento $agendamento): RedirectResponse
@@ -178,6 +233,7 @@ class AgendamentoController extends Controller
             'profissionais' => $profissionais,
             'horarios' => AgendamentoService::horarios(),
             'dataLimite' => $this->agendamentos->dataLimite(),
+            'dataLimiteRecorrencia' => $this->agendamentos->dataLimiteRecorrencia(),
         ];
     }
 }

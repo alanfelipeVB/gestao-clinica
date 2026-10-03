@@ -25,6 +25,20 @@
                             Até quantos dias à frente os profissionais podem agendar uma sala (de 1 a 365).
                         </div>
                     </div>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="antecedencia_recorrencia_dias" class="form-label">Antecedência para recorrência</label>
+                        <div class="input-group has-validation">
+                            <input type="number" id="antecedencia_recorrencia_dias" name="antecedencia_recorrencia_dias"
+                                   value="{{ old('antecedencia_recorrencia_dias', $antecedenciaRecorrenciaDias) }}"
+                                   @class(['form-control', 'is-invalid' => $errors->has('antecedencia_recorrencia_dias')])
+                                   min="7" max="365" required>
+                            <span class="input-group-text">dias</span>
+                            @error('antecedencia_recorrencia_dias') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="form-text">
+                            Até quantos dias à frente uma série recorrente pode gerar agendamentos (de 7 a 365).
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

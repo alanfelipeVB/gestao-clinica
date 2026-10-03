@@ -19,6 +19,7 @@ class ConfiguracaoRequest extends FormRequest
     {
         return [
             ConfiguracaoService::ANTECEDENCIA_MAXIMA_DIAS => ['required', 'integer', 'min:1', 'max:365'],
+            ConfiguracaoService::ANTECEDENCIA_RECORRENCIA_DIAS => ['required', 'integer', 'min:7', 'max:365'],
         ];
     }
 
@@ -26,6 +27,7 @@ class ConfiguracaoRequest extends FormRequest
     {
         return [
             ConfiguracaoService::ANTECEDENCIA_MAXIMA_DIAS => 'antecedência máxima',
+            ConfiguracaoService::ANTECEDENCIA_RECORRENCIA_DIAS => 'antecedência para recorrência',
         ];
     }
 }

@@ -31,7 +31,7 @@ class ConfiguracaoTest extends TestCase
 
         $this->actingAs($profissional)->get('/admin/configuracoes')->assertForbidden();
         $this->actingAs($profissional)
-            ->put('/admin/configuracoes', ['antecedencia_maxima_dias' => 90])
+            ->put('/admin/configuracoes', ['antecedencia_maxima_dias' => 90, 'antecedencia_recorrencia_dias' => 90])
             ->assertForbidden();
 
         $this->assertSame(30, app(ConfiguracaoService::class)->antecedenciaMaximaDias());
@@ -50,11 +50,21 @@ class ConfiguracaoTest extends TestCase
             ->assertSee('Antecedência máxima');
 
         $this->actingAs($admin)
-            ->put('/admin/configuracoes', ['antecedencia_maxima_dias' => 60])
+            ->put('/admin/configuracoes', ['antecedencia_maxima_dias' => 60, 'antecedencia_recorrencia_dias' => 120])
             ->assertRedirect('/admin/configuracoes')
             ->assertSessionHas('sucesso');
 
         $this->assertSame(60, $servico->antecedenciaMaximaDias());
+        $this->assertSame(120, $servico->antecedenciaRecorrenciaDias());
+    }
+
+    public function test_antecedencia_de_recorrencia_padrao_e_validacao(): void
+    {
+        $this->assertSame(90, app(ConfiguracaoService::class)->antecedenciaRecorrenciaDias());
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/admin/configuracoes', ['antecedencia_maxima_dias' => 30, 'antecedencia_recorrencia_dias' => 3])
+            ->assertSessionHasErrors('antecedencia_recorrencia_dias');
     }
 
     public function test_validacao_da_antecedencia(): void
@@ -63,7 +73,7 @@ class ConfiguracaoTest extends TestCase
 
         foreach ([0, 366, 'abc', ''] as $valorInvalido) {
             $this->actingAs($admin)
-                ->put('/admin/configuracoes', ['antecedencia_maxima_dias' => $valorInvalido])
+                ->put('/admin/configuracoes', ['antecedencia_maxima_dias' => $valorInvalido, 'antecedencia_recorrencia_dias' => 90])
                 ->assertSessionHasErrors('antecedencia_maxima_dias');
         }
 

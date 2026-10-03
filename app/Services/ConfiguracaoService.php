@@ -13,6 +13,8 @@ class ConfiguracaoService
 {
     public const ANTECEDENCIA_MAXIMA_DIAS = 'antecedencia_maxima_dias';
 
+    public const ANTECEDENCIA_RECORRENCIA_DIAS = 'antecedencia_recorrencia_dias';
+
     private const CACHE_KEY = 'configuracoes';
 
     /**
@@ -22,6 +24,7 @@ class ConfiguracaoService
      */
     private const PADROES = [
         self::ANTECEDENCIA_MAXIMA_DIAS => '30',
+        self::ANTECEDENCIA_RECORRENCIA_DIAS => '90',
     ];
 
     public function get(string $chave): ?string
@@ -53,6 +56,14 @@ class ConfiguracaoService
     public function antecedenciaMaximaDias(): int
     {
         return $this->int(self::ANTECEDENCIA_MAXIMA_DIAS);
+    }
+
+    /**
+     * Até quantos dias à frente uma série recorrente pode gerar agendamentos.
+     */
+    public function antecedenciaRecorrenciaDias(): int
+    {
+        return $this->int(self::ANTECEDENCIA_RECORRENCIA_DIAS);
     }
 
     /**

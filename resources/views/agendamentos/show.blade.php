@@ -53,6 +53,13 @@
             <div class="card h-100">
                 <div class="card-header bg-white fw-semibold">Histórico</div>
                 <div class="card-body small">
+                    @if ($agendamento->recorrencia)
+                        <p class="mb-2">
+                            <i class="bi bi-arrow-repeat text-primary me-1"></i>
+                            Série {{ mb_strtolower($agendamento->recorrencia->frequencia->label()) }} ·
+                            <a href="{{ route('agendamentos.index', ['recorrencia_id' => $agendamento->recorrencia_id, 'periodo' => 'todos']) }}">ver todos da série</a>
+                        </p>
+                    @endif
                     <p class="mb-2">
                         <i class="bi bi-plus-circle text-success me-1"></i>
                         Criado em {{ $agendamento->created_at->format('d/m/Y H:i') }}
@@ -149,6 +156,19 @@
                             {{ $agendamento->sala->nome }} em {{ $agendamento->inicio->format('d/m/Y') }},
                             {{ $agendamento->horario() }}. O horário ficará livre para outros profissionais.
                         </p>
+                        @if ($agendamento->recorrencia)
+                            <div class="mb-3">
+                                <span class="form-label d-block">Este agendamento faz parte de uma série. Cancelar:</span>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="escopo" id="escopo-este" value="este" checked>
+                                    <label class="form-check-label" for="escopo-este">Somente este</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="escopo" id="escopo-proximos" value="proximos">
+                                    <label class="form-check-label" for="escopo-proximos">Este e os próximos da série</label>
+                                </div>
+                            </div>
+                        @endif
                         <label for="motivo_cancelamento" class="form-label">Motivo (opcional)</label>
                         <input type="text" id="motivo_cancelamento" name="motivo_cancelamento" maxlength="255" class="form-control">
                     </div>

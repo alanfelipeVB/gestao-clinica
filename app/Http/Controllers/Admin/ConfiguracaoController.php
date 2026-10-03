@@ -18,6 +18,7 @@ class ConfiguracaoController extends Controller
     {
         return view('admin.configuracoes.edit', [
             'antecedenciaMaximaDias' => $this->configuracoes->antecedenciaMaximaDias(),
+            'antecedenciaRecorrenciaDias' => $this->configuracoes->antecedenciaRecorrenciaDias(),
         ]);
     }
 

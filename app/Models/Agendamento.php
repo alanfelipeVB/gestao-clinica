@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'user_id', 'sala_id', 'inicio', 'fim', 'descricao', 'status',
+    'user_id', 'sala_id', 'recorrencia_id', 'inicio', 'fim', 'descricao', 'status',
     'criado_por', 'cancelado_por', 'cancelado_em', 'motivo_cancelamento',
     'situacao', 'situacao_marcada_por', 'situacao_marcada_em', 'observacao_atendimento',
 ])]
@@ -69,6 +69,16 @@ class Agendamento extends Model
     public function canceladoPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cancelado_por');
+    }
+
+    /**
+     * Série recorrente da qual o agendamento faz parte (se houver).
+     *
+     * @return BelongsTo<Recorrencia, $this>
+     */
+    public function recorrencia(): BelongsTo
+    {
+        return $this->belongsTo(Recorrencia::class);
     }
 
     /**

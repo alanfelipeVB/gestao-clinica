@@ -78,9 +78,82 @@
     </div>
 </div>
 
+@unless ($editando)
+    @php
+        $repetir = (bool) old('repetir');
+        $fimTipo = old('fim_tipo', 'ocorrencias');
+    @endphp
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="form-check form-switch">
+                <input type="hidden" name="repetir" value="0">
+                <input class="form-check-input" type="checkbox" role="switch" id="repetir" name="repetir" value="1" @checked($repetir)>
+                <label class="form-check-label fw-semibold" for="repetir">
+                    <i class="bi bi-arrow-repeat me-1"></i>Repetir este agendamento
+                </label>
+            </div>
+
+            <div id="campos-repeticao" class="row g-3 mt-1 @unless ($repetir) d-none @endunless">
+                <div class="col-12 col-md-4">
+                    <label for="frequencia" class="form-label">Frequência</label>
+                    <select id="frequencia" name="frequencia" @class(['form-select', 'is-invalid' => $errors->has('frequencia')])>
+                        @foreach (\App\Enums\FrequenciaRecorrencia::cases() as $frequencia)
+                            <option value="{{ $frequencia->value }}" @selected(old('frequencia', 'semanal') === $frequencia->value)>{{ $frequencia->label() }}</option>
+                        @endforeach
+                    </select>
+                    @error('frequencia') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-12 col-md-8">
+                    <span class="form-label d-block">Termina</span>
+                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <input class="form-check-input mt-0" type="radio" name="fim_tipo" id="fim_ocorrencias" value="ocorrencias" @checked($fimTipo === 'ocorrencias')>
+                            <label for="fim_ocorrencias" class="form-check-label">Após</label>
+                            <input type="number" name="ocorrencias" value="{{ old('ocorrencias', 4) }}" min="2" max="{{ \App\Services\RecorrenciaService::MAX_OCORRENCIAS }}"
+                                   @class(['form-control form-control-sm', 'is-invalid' => $errors->has('ocorrencias')]) style="width: 5rem;" aria-label="Número de ocorrências">
+                            <span>ocorrências</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <input class="form-check-input mt-0" type="radio" name="fim_tipo" id="fim_data" value="data" @checked($fimTipo === 'data')>
+                            <label for="fim_data" class="form-check-label">Em</label>
+                            <input type="date" name="data_fim" value="{{ old('data_fim') }}" max="{{ $dataLimiteRecorrencia->format('Y-m-d') }}"
+                                   @class(['form-control form-control-sm', 'is-invalid' => $errors->has('data_fim')]) aria-label="Data final">
+                        </div>
+                    </div>
+                    @error('ocorrencias') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    @error('data_fim') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    <div class="form-text">
+                        As repetições podem ir até {{ $dataLimiteRecorrencia->format('d/m/Y') }}.
+                        Antes de salvar, você verá as datas e quais estão livres.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const chave = document.getElementById('repetir');
+                const campos = document.getElementById('campos-repeticao');
+                const botao = document.getElementById('botao-salvar');
+                const atualizar = () => {
+                    campos.classList.toggle('d-none', !chave.checked);
+                    botao.innerHTML = chave.checked
+                        ? '<i class="bi bi-calendar-week me-1"></i>Ver datas'
+                        : '<i class="bi bi-check-lg me-1"></i>Agendar';
+                };
+                chave.addEventListener('change', atualizar);
+                atualizar();
+            });
+        </script>
+    @endpush
+@endunless
+
 <div class="d-flex justify-content-end gap-2">
     <a href="{{ $editando ? route('agendamentos.show', $agendamento) : route('agendamentos.index') }}" class="btn btn-light">Voltar</a>
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="btn btn-primary" id="botao-salvar">
         <i class="bi bi-check-lg me-1"></i>{{ $editando ? 'Salvar alterações' : 'Agendar' }}
     </button>
 </div>
