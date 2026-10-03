@@ -15,6 +15,7 @@
             <x-sidebar-link rota="agenda" icone="calendar3">Agenda</x-sidebar-link>
             <x-sidebar-link rota="agendamentos.index" icone="journal-check">Agendamentos</x-sidebar-link>
             <x-sidebar-link rota="salas.index" icone="door-open">Salas</x-sidebar-link>
+            <x-sidebar-link rota="relatorio.index" icone="bar-chart-line">Relatório</x-sidebar-link>
         </ul>
 
         @if (auth()->user()?->isAdmin())

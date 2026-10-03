@@ -8,6 +8,7 @@ use App\Http\Controllers\AgendamentoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\SalaController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/perfil/senha', [PerfilController::class, 'atualizarSenha'])->name('perfil.senha');
 
     Route::get('/salas', [SalaController::class, 'index'])->name('salas.index');
+
+    Route::get('/relatorio', [RelatorioController::class, 'index'])->name('relatorio.index');
+    Route::get('/relatorio/exportar', [RelatorioController::class, 'exportar'])->name('relatorio.exportar');
 
     Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
     Route::get('/agenda/eventos', [AgendaController::class, 'eventos'])->name('agenda.eventos');
