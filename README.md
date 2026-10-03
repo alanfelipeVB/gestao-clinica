@@ -12,12 +12,17 @@ Arquitetura, modelo de dados e regras de negócio em detalhes: [docs/ARQUITETURA
 - Cadastro, edição e ativação/desativação de salas (nome, descrição, capacidade, cor na agenda)
 - Ao desativar sala ou profissional com agendamentos futuros: lista os agendamentos e permite mantê-los ou cancelá-los
 - Visualiza, cria (em nome de qualquer profissional), edita e cancela qualquer agendamento
-- Configura a antecedência máxima para agendamento (padrão: 30 dias)
+- Configura a antecedência máxima para agendamento (padrão: 30 dias) e para séries recorrentes (padrão: 90 dias)
+- Envia, publica/oculta e exclui tutoriais em vídeo e acompanha quem já assistiu
+- Relatório mensal de atendimentos por profissional, com exportação CSV
 
 **Profissional**
 - Dashboard com os agendamentos de hoje, os próximos e atalhos
 - Consulta das salas disponíveis e da agenda
-- Cria agendamentos para si, edita e cancela os próprios até o horário de início
+- Cria agendamentos para si (avulsos ou recorrentes: semanal, quinzenal, mensal), edita e cancela os próprios até o horário de início
+- Marca cada atendimento como realizado ou não realizado (até 7 dias após o término)
+- Assiste aos tutoriais publicados e marca como assistido
+- Relatório mensal com os próprios números
 - Na agenda, vê horários de colegas apenas como "Ocupado — nome" (sem descrição)
 - Página "Meu perfil" com dados pessoais e troca de senha
 
@@ -33,6 +38,8 @@ Arquitetura, modelo de dados e regras de negócio em detalhes: [docs/ARQUITETURA
 - Horários em intervalos de 15 minutos, no mesmo dia, nunca no passado e dentro da antecedência máxima.
 - Somente salas e profissionais ativos recebem novos agendamentos.
 - Cancelamentos não apagam registros: guardam quem cancelou, quando e o motivo, e liberam o horário.
+- Séries recorrentes mostram uma prévia das datas; somente as datas livres são criadas, cada uma validada como um agendamento comum.
+- Atendimentos têm situação pendente, realizado ou não realizado; o relatório mensal usa essas marcações.
 
 ## Stack
 
@@ -101,6 +108,17 @@ php artisan serve
 
 Acesse http://localhost:8000 e entre com o e-mail e a senha do administrador definidos no `.env`.
 
+### Upload de vídeos (tutoriais)
+
+Os vídeos podem ter até 500 MB. Ajuste o `php.ini` (e o servidor web, em produção) para aceitar uploads desse tamanho:
+
+```ini
+upload_max_filesize = 512M
+post_max_size = 520M
+```
+
+Os arquivos ficam em `storage/app/private/tutoriais` (fora da pasta pública) e são servidos apenas para usuários autenticados.
+
 ## Testes
 
 Os testes usam o banco MySQL `gestao_clinica_testing` (configurado no `phpunit.xml`), recriado a cada execução.
@@ -138,8 +156,7 @@ docs/ARQUITETURA.md
 | Notificações / e-mail de confirmação | listeners dos eventos de agendamento |
 | Recuperação de senha por e-mail | tabela `password_reset_tokens` já existe |
 | Bloqueios, feriados, horário de funcionamento | regras extras no `AgendamentoService` + chaves em `configuracoes` |
-| Relatórios e exportação Excel/PDF | consultas do `DashboardService` / `agendamentos` |
-| Recorrência | gerar agendamentos individuais validados pelo `AgendamentoService` |
+| Exportação PDF dos relatórios | dados já agregados pelo `RelatorioService` |
 | Calendário externo (iCal/Google) | `inicio`/`fim` em datetime e endpoint de eventos |
 | Permissões granulares | Policies (ou `spatie/laravel-permission`) |
 
