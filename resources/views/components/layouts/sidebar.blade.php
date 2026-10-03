@@ -16,6 +16,7 @@
             <x-sidebar-link rota="agendamentos.index" icone="journal-check">Agendamentos</x-sidebar-link>
             <x-sidebar-link rota="salas.index" icone="door-open">Salas</x-sidebar-link>
             <x-sidebar-link rota="relatorio.index" icone="bar-chart-line">Relatório</x-sidebar-link>
+            <x-sidebar-link rota="tutoriais.index" icone="play-btn">Tutoriais</x-sidebar-link>
         </ul>
 
         @if (auth()->user()?->isAdmin())
@@ -23,6 +24,7 @@
             <ul class="nav flex-column gap-1">
                 <x-sidebar-link rota="admin.profissionais.index" icone="people">Profissionais</x-sidebar-link>
                 <x-sidebar-link rota="admin.salas.index" icone="building-gear">Gerenciar salas</x-sidebar-link>
+                <x-sidebar-link rota="admin.tutoriais.index" icone="collection-play">Gerenciar tutoriais</x-sidebar-link>
                 <x-sidebar-link rota="admin.configuracoes.edit" icone="gear">Configurações</x-sidebar-link>
             </ul>
         @endif

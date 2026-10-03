@@ -38,6 +38,8 @@ return [
     'ends_with' => 'O campo :attribute deve terminar com: :values.',
     'enum' => 'O valor selecionado em :attribute é inválido.',
     'exists' => 'O valor selecionado em :attribute é inválido.',
+    'extensions' => 'O campo :attribute deve ter uma das extensões: :values.',
+    'file' => 'O campo :attribute deve ser um arquivo.',
     'filled' => 'O campo :attribute deve ter um valor.',
     'gt' => [
         'numeric' => 'O campo :attribute deve ser maior que :value.',
@@ -65,6 +67,8 @@ return [
         'numeric' => 'O campo :attribute não pode ser maior que :max.',
         'string' => 'O campo :attribute não pode ter mais de :max caracteres.',
     ],
+    'mimes' => 'O campo :attribute deve ser um arquivo do tipo: :values.',
+    'mimetypes' => 'O campo :attribute deve ser um arquivo do tipo: :values.',
     'min' => [
         'array' => 'O campo :attribute deve ter pelo menos :min itens.',
         'file' => 'O campo :attribute deve ter pelo menos :min kilobytes.',
@@ -100,6 +104,7 @@ return [
     'string' => 'O campo :attribute deve ser um texto.',
     'timezone' => 'O campo :attribute deve ser um fuso horário válido.',
     'unique' => 'Este :attribute já está em uso.',
+    'uploaded' => 'Não foi possível enviar o :attribute. Verifique o tamanho máximo permitido pelo servidor.',
     'url' => 'O campo :attribute deve ser uma URL válida.',
 
     /*

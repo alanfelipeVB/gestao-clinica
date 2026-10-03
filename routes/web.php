@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ConfiguracaoController;
 use App\Http\Controllers\Admin\ProfissionalController;
 use App\Http\Controllers\Admin\SalaController as AdminSalaController;
+use App\Http\Controllers\Admin\TutorialController as AdminTutorialController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AgendamentoController;
 use App\Http\Controllers\Auth\LoginController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\SalaController;
+use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -39,6 +41,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/perfil/senha', [PerfilController::class, 'atualizarSenha'])->name('perfil.senha');
 
     Route::get('/salas', [SalaController::class, 'index'])->name('salas.index');
+
+    Route::get('/tutoriais', [TutorialController::class, 'index'])->name('tutoriais.index');
+    Route::get('/tutoriais/{tutorial}', [TutorialController::class, 'show'])->name('tutoriais.show');
+    Route::get('/tutoriais/{tutorial}/video', [TutorialController::class, 'video'])->name('tutoriais.video');
+    Route::post('/tutoriais/{tutorial}/assistido', [TutorialController::class, 'marcarAssistido'])->name('tutoriais.assistido');
 
     Route::get('/relatorio', [RelatorioController::class, 'index'])->name('relatorio.index');
     Route::get('/relatorio/exportar', [RelatorioController::class, 'exportar'])->name('relatorio.exportar');
@@ -75,6 +82,11 @@ Route::middleware('auth')->group(function () {
             ->name('salas.status');
         Route::get('salas/{sala}/desativar', [AdminSalaController::class, 'confirmarDesativacao'])
             ->name('salas.desativar');
+
+        Route::resource('tutoriais', AdminTutorialController::class)
+            ->parameters(['tutoriais' => 'tutorial']);
+        Route::patch('tutoriais/{tutorial}/publicacao', [AdminTutorialController::class, 'alternarPublicacao'])
+            ->name('tutoriais.publicacao');
 
         Route::get('configuracoes', [ConfiguracaoController::class, 'edit'])->name('configuracoes.edit');
         Route::put('configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');

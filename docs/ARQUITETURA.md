@@ -167,6 +167,13 @@ O profissional vê os agendamentos de colegas apenas como **"Ocupado — nome do
 - A série é guardada em `recorrencias`; cada agendamento aponta para ela (`recorrencia_id`).
 - Cancelamento: "somente este" ou "este e os próximos da série". A edição continua individual.
 
+### 4.10 Tutoriais
+- O administrador envia vídeos (MP4/WebM, até 500 MB) com título, descrição, ordem e status (publicado/rascunho).
+- Os arquivos ficam no disco privado `local` (`storage/app/private/tutoriais`), sem URL pública; são entregues pela rota `tutoriais.video`, que exige login (com suporte a Range para avançar/voltar).
+- Profissionais veem apenas os publicados; o administrador também pré-visualiza rascunhos.
+- Cada usuário pode marcar/desmarcar um tutorial como assistido (`tutorial_visualizacoes`); o administrador vê quem assistiu.
+- O limite de upload também depende do PHP (`upload_max_filesize` e `post_max_size`) e do servidor web.
+
 ## 5. Autenticação
 - Login por e-mail e senha usando o `Auth` nativo do Laravel (sem pacote de starter kit).
 - Sem cadastro público: contas são criadas pelo administrador.
