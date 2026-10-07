@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ? $title.' · ' : '' }}{{ $marca['nome'] }}</title>
+    <link rel="icon" href="{{ $marca['favicon']['url'] }}" @if ($marca['favicon']['tipo']) type="{{ $marca['favicon']['tipo'] }}" @endif>
 
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])

@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ? $title.' · ' : '' }}{{ $marca['nome'] }}</title>
+    <link rel="icon" href="{{ $marca['favicon']['url'] }}" @if ($marca['favicon']['tipo']) type="{{ $marca['favicon']['tipo'] }}" @endif>
     @if ($descricao)
         <meta name="description" content="{{ Str::limit($descricao, 160) }}">
     @endif

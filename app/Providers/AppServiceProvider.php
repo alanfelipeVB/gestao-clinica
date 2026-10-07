@@ -28,13 +28,14 @@ class AppServiceProvider extends ServiceProvider
         // Fora de produção, acusa consultas N+1 (relacionamento carregado sob demanda).
         Model::preventLazyLoading(! $this->app->isProduction());
 
-        // Nome e logo da clínica disponíveis em todos os layouts (menu, login, site).
+        // Nome, logo e favicon da clínica disponíveis em todos os layouts (menu, login, site).
         View::composer('components.layouts.*', function ($view) {
             $site = app(SiteService::class);
 
             $view->with('marca', [
                 'nome' => $site->textos()['site_nome'],
                 'logo' => $site->urlLogo(),
+                'favicon' => $site->iconeDaAba(),
             ]);
         });
     }

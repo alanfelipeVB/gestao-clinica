@@ -37,6 +37,12 @@ class PaginaInicialRequest extends FormRequest
             // SVG não é aceito: pode conter scripts.
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'remover_logo' => ['nullable', 'boolean'],
+            'favicon' => [
+                'nullable', 'file', 'max:512',
+                'mimetypes:image/png,image/webp,image/x-icon,image/vnd.microsoft.icon',
+                'extensions:png,webp,ico',
+            ],
+            'remover_favicon' => ['nullable', 'boolean'],
         ];
     }
 
@@ -54,6 +60,7 @@ class PaginaInicialRequest extends FormRequest
             'site_instagram' => 'instagram',
             'site_horario' => 'horário de atendimento',
             'logo' => 'logo',
+            'favicon' => 'favicon',
         ];
     }
 
@@ -64,6 +71,9 @@ class PaginaInicialRequest extends FormRequest
             'site_whatsapp.regex' => 'O WhatsApp deve conter apenas números, espaços, parênteses, + e -.',
             'site_instagram.regex' => 'O instagram deve conter apenas letras, números, ponto e sublinhado.',
             'logo.max' => 'A logo pode ter no máximo 2 MB.',
+            'favicon.max' => 'O favicon pode ter no máximo 512 KB.',
+            'favicon.mimetypes' => 'O favicon deve ser PNG, WebP ou ICO.',
+            'favicon.extensions' => 'O favicon deve ser PNG, WebP ou ICO.',
         ];
     }
 }

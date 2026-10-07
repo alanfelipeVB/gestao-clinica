@@ -28,6 +28,19 @@ class SiteController extends Controller
     }
 
     /**
+     * Favicon enviado pelo administrador (público).
+     */
+    public function favicon(): BinaryFileResponse
+    {
+        $caminho = $this->site->favicon();
+        abort_unless($caminho, 404);
+
+        return response()->file(Storage::disk('local')->path($caminho), [
+            'Cache-Control' => 'public, max-age=604800',
+        ]);
+    }
+
+    /**
      * Foto do profissional: pública para quem aparece na página inicial;
      * nos demais casos, apenas o administrador e o próprio profissional (prévia nos formulários).
      */

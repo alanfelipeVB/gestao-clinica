@@ -19,17 +19,24 @@ class PaginaInicialController extends Controller
         return view('admin.pagina-inicial.edit', [
             'textos' => $this->site->textos(),
             'urlLogo' => $this->site->urlLogo(),
+            'urlFavicon' => $this->site->urlFavicon(),
         ]);
     }
 
     public function update(PaginaInicialRequest $request): RedirectResponse
     {
-        $this->site->salvarTextos($request->safe()->except(['logo', 'remover_logo']));
+        $this->site->salvarTextos($request->safe()->except(['logo', 'remover_logo', 'favicon', 'remover_favicon']));
 
         if ($request->hasFile('logo')) {
             $this->site->trocarLogo($request->file('logo'));
         } elseif ($request->boolean('remover_logo')) {
             $this->site->removerLogo();
+        }
+
+        if ($request->hasFile('favicon')) {
+            $this->site->trocarFavicon($request->file('favicon'));
+        } elseif ($request->boolean('remover_favicon')) {
+            $this->site->removerFavicon();
         }
 
         return redirect()

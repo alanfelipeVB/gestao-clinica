@@ -41,6 +41,26 @@
                         </div>
                     @endif
 
+                    <label for="favicon" class="form-label mt-3">Favicon (ícone da aba do navegador)</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="{{ $urlFavicon ?? $urlLogo ?? asset('favicon.svg') }}" alt="Favicon atual" class="border rounded bg-white p-1"
+                             style="width: 2.5rem; height: 2.5rem; object-fit: contain;">
+                        <input type="file" id="favicon" name="favicon" accept="image/png,image/webp,.ico" class="form-control {{ $erro('favicon') }}">
+                    </div>
+                    @error('favicon') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                    <div class="form-text">
+                        PNG, WebP ou ICO, quadrado (ex.: 512×512), até 512 KB.
+                        @unless ($urlFavicon)
+                            Sem favicon próprio, é usada a logo{{ $urlLogo ? '' : ' (ou o ícone padrão do sistema)' }}.
+                        @endunless
+                    </div>
+                    @if ($urlFavicon)
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="remover_favicon" name="remover_favicon" value="1">
+                            <label class="form-check-label" for="remover_favicon">Remover favicon (volta a usar a logo)</label>
+                        </div>
+                    @endif
+
                     <label for="site_nome" class="form-label mt-3">Nome da clínica</label>
                     <input type="text" id="site_nome" name="site_nome" value="{{ $campo('site_nome') }}" maxlength="100" class="form-control {{ $erro('site_nome') }}">
                     @error('site_nome') <div class="invalid-feedback">{{ $message }}</div> @enderror

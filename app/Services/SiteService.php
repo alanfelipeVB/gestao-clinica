@@ -15,6 +15,8 @@ class SiteService
 
     private const LOGO = 'site_logo';
 
+    private const FAVICON = 'site_favicon';
+
     /**
      * Campos de texto editáveis e seus valores padrão.
      *
@@ -65,9 +67,7 @@ class SiteService
 
     public function logo(): ?string
     {
-        $caminho = $this->configuracoes->get(self::LOGO);
-
-        return $caminho && Storage::disk('local')->exists($caminho) ? $caminho : null;
+        return $this->arquivo(self::LOGO);
     }
 
     /**
@@ -75,28 +75,86 @@ class SiteService
      */
     public function urlLogo(): ?string
     {
-        $caminho = $this->logo();
-
-        return $caminho ? route('site.logo', ['v' => substr(md5($caminho), 0, 8)]) : null;
+        return $this->url(self::LOGO, 'site.logo');
     }
 
     public function trocarLogo(UploadedFile $arquivo): void
     {
-        $anterior = $this->logo();
+        $this->trocarArquivo(self::LOGO, $arquivo);
+    }
 
-        $this->configuracoes->salvar([self::LOGO => $arquivo->store(self::PASTA, 'local')]);
+    public function removerLogo(): void
+    {
+        $this->removerArquivo(self::LOGO);
+    }
+
+    public function favicon(): ?string
+    {
+        return $this->arquivo(self::FAVICON);
+    }
+
+    public function urlFavicon(): ?string
+    {
+        return $this->url(self::FAVICON, 'site.favicon');
+    }
+
+    public function trocarFavicon(UploadedFile $arquivo): void
+    {
+        $this->trocarArquivo(self::FAVICON, $arquivo);
+    }
+
+    public function removerFavicon(): void
+    {
+        $this->removerArquivo(self::FAVICON);
+    }
+
+    /**
+     * Ícone da aba do navegador: favicon próprio → logo → ícone padrão do sistema.
+     *
+     * @return array{url: string, tipo: ?string}
+     */
+    public function iconeDaAba(): array
+    {
+        foreach ([[self::FAVICON, 'site.favicon'], [self::LOGO, 'site.logo']] as [$chave, $rota]) {
+            if ($caminho = $this->arquivo($chave)) {
+                return ['url' => $this->url($chave, $rota), 'tipo' => Storage::disk('local')->mimeType($caminho) ?: null];
+            }
+        }
+
+        return ['url' => asset('favicon.svg'), 'tipo' => 'image/svg+xml'];
+    }
+
+    private function arquivo(string $chave): ?string
+    {
+        $caminho = $this->configuracoes->get($chave);
+
+        return $caminho && Storage::disk('local')->exists($caminho) ? $caminho : null;
+    }
+
+    private function url(string $chave, string $rota): ?string
+    {
+        $caminho = $this->arquivo($chave);
+
+        return $caminho ? route($rota, ['v' => substr(md5($caminho), 0, 8)]) : null;
+    }
+
+    private function trocarArquivo(string $chave, UploadedFile $arquivo): void
+    {
+        $anterior = $this->arquivo($chave);
+
+        $this->configuracoes->salvar([$chave => $arquivo->store(self::PASTA, 'local')]);
 
         if ($anterior) {
             Storage::disk('local')->delete($anterior);
         }
     }
 
-    public function removerLogo(): void
+    private function removerArquivo(string $chave): void
     {
-        if ($anterior = $this->logo()) {
+        if ($anterior = $this->arquivo($chave)) {
             Storage::disk('local')->delete($anterior);
         }
 
-        $this->configuracoes->salvar([self::LOGO => null]);
+        $this->configuracoes->salvar([$chave => null]);
     }
 }

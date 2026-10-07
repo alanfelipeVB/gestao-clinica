@@ -126,6 +126,48 @@ class PaginaInicialTest extends TestCase
             ->assertSee('alt="Clínica Bem Viver"', false);
     }
 
+    public function test_favicon_padrao_logo_e_proprio(): void
+    {
+        // Sem logo nem favicon: ícone padrão do sistema, em todas as áreas.
+        $this->get('/')->assertSee('<link rel="icon" href="'.asset('favicon.svg').'"', false);
+        $this->get('/login')->assertSee(asset('favicon.svg'), false);
+        $this->assertFileExists(public_path('favicon.svg'));
+
+        // Com logo: a logo vira o favicon.
+        $this->actingAs($this->admin)->put('/admin/pagina-inicial', $this->dados(['logo' => $this->imagem('logo.png')]));
+        $this->actingAs($this->admin)->get('/dashboard')
+            ->assertSee('<link rel="icon" href="'.route('site.logo'), false)
+            ->assertSee('type="image/png"', false);
+
+        // Favicon próprio tem prioridade e é público.
+        $this->actingAs($this->admin)
+            ->put('/admin/pagina-inicial', $this->dados(['favicon' => $this->imagem('icone.png')]))
+            ->assertSessionHasNoErrors();
+        auth()->logout();
+        $this->get('/')->assertSee('<link rel="icon" href="'.route('site.favicon'), false);
+        $this->get(route('site.favicon'))->assertOk();
+
+        // Remover o favicon volta para a logo.
+        $this->actingAs($this->admin)->put('/admin/pagina-inicial', $this->dados(['remover_favicon' => '1']));
+        $this->assertNull(app(SiteService::class)->favicon());
+        $this->get('/')->assertSee('<link rel="icon" href="'.route('site.logo'), false);
+    }
+
+    public function test_favicon_invalido_e_rejeitado(): void
+    {
+        $this->actingAs($this->admin)
+            ->put('/admin/pagina-inicial', $this->dados([
+                'favicon' => UploadedFile::fake()->create('icone.pdf', 10, 'application/pdf'),
+            ]))
+            ->assertSessionHasErrors('favicon');
+
+        $this->actingAs($this->admin)
+            ->put('/admin/pagina-inicial', $this->dados([
+                'favicon' => UploadedFile::fake()->create('grande.png', 600, 'image/png'),
+            ]))
+            ->assertSessionHasErrors('favicon');
+    }
+
     public function test_envio_troca_e_remocao_da_logo(): void
     {
         $this->actingAs($this->admin)
