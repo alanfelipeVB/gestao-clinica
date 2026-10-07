@@ -107,6 +107,25 @@ class PaginaInicialTest extends TestCase
             ->assertSessionHasErrors(['site_email', 'site_whatsapp', 'logo']);
     }
 
+    public function test_menus_mostram_so_a_logo_quando_ela_existe(): void
+    {
+        $this->actingAs($this->admin)->put('/admin/pagina-inicial', $this->dados());
+
+        // Sem logo: o nome aparece como texto nos menus.
+        $this->get('/')->assertSee('<span>Clínica Bem Viver</span>', false);
+        $this->actingAs($this->admin)->get('/dashboard')->assertSee('<span class="fw-semibold">Clínica Bem Viver</span>', false);
+
+        $this->actingAs($this->admin)->put('/admin/pagina-inicial', $this->dados(['logo' => $this->imagem('logo.png')]));
+
+        // Com logo: só a imagem (o nome fica como texto alternativo).
+        $this->get('/')
+            ->assertDontSee('<span>Clínica Bem Viver</span>', false)
+            ->assertSee('alt="Clínica Bem Viver"', false);
+        $this->actingAs($this->admin)->get('/dashboard')
+            ->assertDontSee('<span class="fw-semibold">Clínica Bem Viver</span>', false)
+            ->assertSee('alt="Clínica Bem Viver"', false);
+    }
+
     public function test_envio_troca_e_remocao_da_logo(): void
     {
         $this->actingAs($this->admin)

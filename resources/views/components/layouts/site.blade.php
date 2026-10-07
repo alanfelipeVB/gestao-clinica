@@ -17,12 +17,13 @@
     <nav class="navbar navbar-expand-md bg-white border-bottom sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="{{ route('inicio') }}">
+                {{-- Com logo, só a logo; sem logo, ícone e nome da clínica. --}}
                 @if ($marca['logo'])
-                    <img src="{{ $marca['logo'] }}" alt="Logo {{ $marca['nome'] }}" style="height: 2.75rem; max-width: 9rem; object-fit: contain;">
+                    <img src="{{ $marca['logo'] }}" alt="{{ $marca['nome'] }}" style="height: 3rem; max-width: 12rem; object-fit: contain;">
                 @else
                     <i class="bi bi-calendar2-heart fs-3 text-primary"></i>
+                    <span>{{ $marca['nome'] }}</span>
                 @endif
-                <span>{{ $marca['nome'] }}</span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-site"
