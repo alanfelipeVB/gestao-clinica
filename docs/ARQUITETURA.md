@@ -218,7 +218,7 @@ Redireciona com mensagem de sucesso
 | Login | todos |
 | Dashboard admin: totais, agendamentos do dia, próximos, salas ocupadas agora, salas livres | admin |
 | Dashboard profissional: meus agendamentos de hoje, próximos, atalho "Novo agendamento" | profissional |
-| Agenda (dia/semana/mês, filtros por sala, profissional e data, modal de detalhes) | todos |
+| Agenda: modo "Salas lado a lado" (um calendário de dia por sala, data e rolagem sincronizadas) e modo "Calendário" (dia/semana/mês/lista); filtros por sala, profissional e data; modal de detalhes | todos |
 | Agendamentos: lista com filtros, criar/editar, cancelar, detalhes | todos (escopo por perfil) |
 | Profissionais: tabela, criar/editar, ativar/desativar, redefinir senha | admin |
 | Salas: tabela, criar/editar, ativar/desativar | admin |

@@ -68,6 +68,22 @@ class AgendaTest extends TestCase
             ->assertSee('Bruno Lima');
     }
 
+    public function test_tela_oferece_salas_lado_a_lado_com_as_salas_ativas(): void
+    {
+        Sala::factory()->inativa()->create(['nome' => 'Sala Desativada']);
+
+        $resposta = $this->actingAs($this->ana)->get('/agenda')
+            ->assertOk()
+            ->assertSee('Salas lado a lado')
+            ->assertSee('id="salas-lado-a-lado"', false);
+
+        preg_match("/data-salas='([^']+)'/", $resposta->getContent(), $m);
+        $colunas = collect(json_decode(html_entity_decode($m[1]), true));
+
+        $this->assertSame(['Sala 01', 'Sala 02'], $colunas->pluck('nome')->all());
+        $this->assertSame('#0f766e', $colunas->firstWhere('nome', 'Sala 01')['cor']);
+    }
+
     public function test_retorna_apenas_agendamentos_ativos_do_periodo(): void
     {
         $resposta = $this->eventos($this->ana)->assertOk();

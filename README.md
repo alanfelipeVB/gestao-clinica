@@ -32,7 +32,8 @@ Arquitetura, modelo de dados e regras de negócio em detalhes: [docs/ARQUITETURA
 - Página "Meu perfil" com dados pessoais, foto, mini biografia, autorização para publicar o WhatsApp no site e troca de senha
 
 **Agenda visual**
-- Visões de dia, semana, mês e lista (padrão no celular), em português
+- Modo **Salas lado a lado**: uma coluna por sala no mesmo dia, com navegação e rolagem sincronizadas (padrão no computador)
+- Modo **Calendário**: visões de dia, semana, mês e lista (padrão no celular), em português
 - Filtros por sala, profissional e data
 - Clique em um agendamento abre os detalhes; clique/arrasto em horário livre abre o formulário pré-preenchido
 

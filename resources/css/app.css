@@ -264,3 +264,52 @@ body.site {
 .min-w-0 {
     min-width: 0;
 }
+
+/* Agenda: salas lado a lado (uma coluna por sala; rolagem horizontal quando não couberem). */
+.agenda-salas {
+    display: grid;
+    grid-template-columns: repeat(var(--colunas, 2), minmax(260px, 1fr));
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+
+.agenda-sala-cabecalho {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--bs-border-color);
+    border-top: 4px solid;
+    border-bottom: 0;
+    border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
+    background: var(--bs-tertiary-bg);
+}
+
+.agenda-sala-calendario {
+    --fc-border-color: #e5e7eb;
+    --fc-today-bg-color: transparent;
+    --fc-now-indicator-color: #dc2626;
+    font-size: 0.875rem;
+}
+
+.agenda-sala-calendario .fc-event {
+    cursor: pointer;
+}
+
+.agenda-sala-calendario .fc-event-detalhe {
+    padding: 2px 4px;
+    line-height: 1.25;
+    overflow: hidden;
+    font-size: 0.78rem;
+}
+
+.agenda-sala-calendario .evento-ocupado {
+    opacity: 0.75;
+    background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.18) 0 6px, transparent 6px 12px);
+}
+
+.agenda-sala-calendario .fc-highlight {
+    background: rgba(15, 118, 110, 0.15);
+}

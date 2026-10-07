@@ -49,6 +49,36 @@
 
     <div class="card">
         <div class="card-body">
+            <div class="d-flex justify-content-end mb-3">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Modo de visualização da agenda">
+                    <button type="button" class="btn btn-outline-primary" data-modo-agenda="salas" aria-pressed="false">
+                        <i class="bi bi-layout-three-columns me-1"></i>Salas lado a lado
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-modo-agenda="calendario" aria-pressed="false">
+                        <i class="bi bi-calendar3 me-1"></i>Calendário
+                    </button>
+                </div>
+            </div>
+
+            {{-- Modo "Salas lado a lado": um calendário de dia por sala. --}}
+            <div id="salas-lado-a-lado" class="d-none"
+                 data-salas='@json($salas->map(fn ($s) => ['id' => $s->id, 'nome' => $s->nome, 'cor' => $s->cor])->values())'>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <div class="btn-group" role="group" aria-label="Navegar entre os dias">
+                        <button type="button" class="btn btn-outline-secondary" data-salas-acao="anterior" aria-label="Dia anterior">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-salas-acao="proximo" aria-label="Próximo dia">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary" data-salas-acao="hoje">Hoje</button>
+                    <h2 id="titulo-salas" class="h6 mb-0 ms-md-2 fw-semibold"></h2>
+                </div>
+                <div id="colunas-salas" class="agenda-salas"></div>
+            </div>
+
+            {{-- Modo "Calendário": dia, semana, mês e lista. --}}
             <div id="calendario"
                  data-eventos-url="{{ route('agenda.eventos') }}"
                  data-criar-url="{{ route('agendamentos.create') }}"
